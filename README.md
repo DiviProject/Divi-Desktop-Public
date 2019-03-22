@@ -1,4 +1,4 @@
-# divi-desktop – UI pulled code from Divicoin/divi-desktop/ repo/develop branch 20180529
+# Divi Desktop Public Repository
 
 > *"Divi is an open source project that aims to ease of use to cryptocurrency."*
 
@@ -39,5 +39,9 @@ You can directly interact with the daemon ran by the Electron version.
 * `yarn run package:win` – Windows
 * `yarn run package:mac` – OSX
 * `yarn run package:linux` – Linux
+
+## Credits & License
+
+This application was originally forked from [Particl Desktop](https://github.com/particl/particl-desktop) and is used under the [GNU General Public License](https://github.com/Divicoin/Divi-Desktop-Public/blob/master/LICENSE) 
 
 
