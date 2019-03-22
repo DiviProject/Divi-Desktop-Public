@@ -1,0 +1,22 @@
+<div class="container disable-select">
+  <div class="content">
+    <div class="section">
+      <div class="title">Wallet verification result</div>
+      <div *ngIf="!verified" class="info">Your wallet may be corrupted, please restore from seed.</div>
+      <div *ngIf="verified" class="info">Your wallet is verified and working as expected.</div>
+      <div class="actions">
+        <button *ngIf="!verified" mat-raised-button 
+          color="primary" 
+          (click)="restore()">
+          <mat-icon fontSet="partIcon" fontIcon="part-lock-open"></mat-icon>
+          Restore
+        </button>
+        <button mat-raised-button 
+                color="primary" 
+                (click)="close()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

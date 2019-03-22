@@ -1,0 +1,17 @@
+<div class="container disable-select">
+  <div class="content">
+    <div class="section">
+      <div class="title">Release Info</div>
+      <div class="version">Divi Desktop Version {{releaseInfo.version}}</div>
+      <div class="release-notes" [innerHTML]="releaseInfo.releaseNotes"></div>
+      <div class="actions">
+        <button mat-raised-button 
+                color="primary" 
+                (click)="close()"
+                *ngIf="dialogRef.componentInstance.enableClose">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

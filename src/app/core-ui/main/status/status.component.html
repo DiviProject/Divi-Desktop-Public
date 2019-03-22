@@ -1,0 +1,34 @@
+<div class="status-icon disable-select">
+
+  <span class="status icon" matTooltip="Peers: {{ peerListCount }}">
+    <img src="assets/icons/SVG/network/peers-{{ getIconNumber() }}.svg"/>
+  </span>
+
+  <!-- srha -->
+  <span *ngIf="encryptionStatus"
+    class="encryption icon"
+    matTooltip="{{ encryptionStatus }}"
+    container="body"
+    matTooltipPosition="below"
+    (click)="toggle()">
+      <img src="assets/icons/SVG/{{ encryptionStatusIcon }}.svg"/>
+  </span>
+
+  <span 
+    class="staking icon"
+    [matTooltip]="stakingEnabled ? 'Staking enabled' : 'Staking disabled'"
+    [ngClass]="{'enabled': stakingEnabled, 'disabled': !stakingEnabled}"
+    container="body"
+    matTooltipPosition="below">
+      <img src="assets/icons/SVG/staking_icon.svg"/>
+  </span>
+
+    <span
+    class="console icon"
+    matTooltip="Debug Console"
+    container="body"
+    (click)="openConsoleWindow()">
+      <mat-icon class="icon" fontSet="partIcon" fontIcon="part-console-window"></mat-icon>
+  </span>
+
+  </div><!-- .status-icons -->

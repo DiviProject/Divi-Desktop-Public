@@ -1,0 +1,23 @@
+{
+  "name": "divi-daemon-manager",
+  "version": "1.0.0",
+  "description": "RESTful api for managing divi daemon",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "divi",
+    "blockchain"
+  ],
+  "author": "ilagin",
+  "homepage": "https://diviproject.org",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "lodash": "^4.17.10",
+    "path": "^0.12.7",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2"
+  }
+}

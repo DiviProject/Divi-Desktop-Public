@@ -1,0 +1,236 @@
+/* TODO: remove this completely */
+
+/* @import '~https://fonts.googleapis.com/icon?family=Material+Icons'; */
+/* @import '~@angular/material/prebuilt-themes/indigo-pink.css'; */
+@import "./src/assets/_config"; // import shared colors etc.
+
+/* card element */
+// test
+
+/*
+.card {
+  position: relative;
+  background-color: white;
+  padding: 20px;
+  margin: 0 0 20px 0;
+  border-bottom: 1px solid #F1F1F1;
+}
+
+
+.col-xs-6 {
+  padding-left: 0;
+}
+
+.col-xs-4 {
+  padding-left: 0;
+}
+*/
+
+/* label of an input in a card */
+/*
+.input-label {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.9em;
+}*/
+
+/* Divi buttons */
+/*
+button {
+  background-color: white;
+  border: none;
+  padding: 8px 30px;
+  margin: 0 5px 20px 5px;
+  font-weight: bold;
+  font-size: 0.8em;
+  border-bottom: 1px solid #F1F1F1;
+}
+button:active {
+  border: 0px;
+  transform: translateY(2px);
+}
+.warning {
+  color: white;
+  background-color: #ED4B4D;
+}
+.validate {
+  color: white;
+  background-color: #03E8B0;
+}*/
+
+/* Divi inputs */
+/*input[type="text"] {
+  background-color: #fff;
+  border: 1px solid #EDEDED;
+  padding: 4px;
+}*/
+
+.settings-page {
+  padding-left: 34px;
+}
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {display:none;}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #f44336;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #f44336;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.toggleSpan {
+  top: -12px;
+  position: relative;
+}
+
+.material-checkbox {
+  position: relative;
+  display: inline-block;
+  color: rgba(0, 0, 0, 0.87);
+  cursor: pointer;
+  font-family: "Roboto", "Segoe UI", BlinkMacSystemFont, system-ui, -apple-system;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.material-checkbox > input {
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  position: absolute;
+  z-index: -1;
+  left: -15px;
+  top: -15px;
+  display: block;
+  margin: 0;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  background-color: rgba(0, 0, 0, 0.42);
+  outline: none;
+  opacity: 0;
+  transform: scale(1);
+  -ms-transform: scale(0); /* Graceful degradation for IE */
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+.material-checkbox > input:checked {
+  background-color: #2196f3;
+}
+
+.material-checkbox:active > input {
+  opacity: 1;
+  transform: scale(0);
+  transition: opacity 0s, transform 0s;
+}
+
+.material-checkbox > input:disabled {
+  opacity: 0;
+}
+
+.material-checkbox > input:disabled + span {
+  cursor: initial;
+}
+
+.material-checkbox > span::before {
+  content: "";
+  display: inline-block;
+  margin-right: 15px;
+  border: solid 2px rgba(0, 0, 0, 0.42);
+  border-radius: 2px;
+  width: 14px;
+  height: 14px;
+  vertical-align: -4px;
+  transition: border-color 0.5s, background-color 0.5s;
+}
+
+.material-checkbox > input:checked + span::before {
+  border-color: #2196f3;
+  background-color: #2196f3;
+}
+
+.material-checkbox > input:active + span::before {
+  border-color: #2196f3;
+}
+
+.material-checkbox > input:checked:active + span::before {
+  border-color: transparent;
+  background-color: rgba(0, 0, 0, 0.42);
+}
+
+.material-checkbox > input:disabled + span::before {
+  border-color: rgba(0, 0, 0, 0.26);
+}
+
+.material-checkbox > input:checked:disabled + span::before {
+  border-color: transparent;
+  background-color: rgba(0, 0, 0, 0.26);
+}
+
+.material-checkbox > span::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 10px;
+  border: solid 2px transparent;
+  border-left: none;
+  border-top: none;
+  transform: translate(5.5px, 1px) rotate(45deg);
+  -ms-transform: translate(5.5px, 2px) rotate(45deg);
+}
+
+.material-checkbox > input:checked + span::after {
+  border-color: #fff;
+}

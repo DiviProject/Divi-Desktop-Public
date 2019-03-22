@@ -1,0 +1,125 @@
+Davids-iMac:divi-dt dcaldwell$ divi-cli help
+== Blockchain ==
+getbestblockhash
+getblock "hash" ( verbose )
+getblockchaininfo
+getblockcount
+getblockhash index
+getblockheader "hash" ( verbose )
+getchaintips
+getdifficulty
+getmempoolinfo
+getrawmempool ( verbose )
+gettxout "txid" n ( includemempool )
+gettxoutsetinfo
+verifychain ( numblocks )
+
+== Control ==
+getinfo
+help ( "command" )
+stop
+
+== Divi ==
+allocatefunds purpose alias amount ( "pay wallet" ( "voting wallet" ) )
+createmasternodekey is deprecated!  A masternodekey is no longer necessary for setup.
+fundmasternode alias amount TxID masternode ( "pay wallet" ( "voting wallet" ) )
+getmasternodecount
+getmasternodeoutputs is deprecated!  It has been replaced by fundmasternode for setup.
+getmasternodewinners is a work in progress!  Check back soon.
+getmasternodestatus
+getmasternodewinners is a work in progress!  Check back soon.
+Obfuscation, in general, and getpoolinfo, in particular, are deprecated!
+listmasternodeconf is deprecated!  It is not necessary for setup.
+listmasternodes ( "filter" )
+masternode is deprecated!  Use one of the newer, clearer commands.
+masternodeconnect "address"
+masternodecurrent
+mnsync "status|reset"
+spork <name> [<value>]
+startmasternode is deprecated!  Masternode now automatically start themselves
+
+== Generating ==
+getgenerate
+gethashespersec
+setgenerate generate ( genproclimit )
+
+== Getinvalid ==
+getinvalid
+
+== Mining ==
+getblocktemplate ( "jsonrequestobject" )
+getmininginfo
+getnetworkhashps ( blocks height )
+prioritisetransaction <txid> <priority delta> <fee delta>
+reservebalance ( reserve amount )
+submitblock "hexdata" ( "jsonparametersobject" )
+
+== Network ==
+addnode "node" "add|remove|onetry"
+getaddednodeinfo dns ( "node" )
+getconnectioncount
+getnettotals
+getnetworkinfo
+getpeerinfo
+ping
+
+== Rawtransactions ==
+createrawtransaction [{"txid":"id","vout":n},...] {"address":amount,...}
+decoderawtransaction "hexstring"
+decodescript "hex"
+getrawtransaction "txid" ( verbose )
+sendrawtransaction "hexstring" ( allowhighfees )
+signrawtransaction "hexstring" ( [{"txid":"id","vout":n,"scriptPubKey":"hex","redeemScript":"hex"},...] ["privatekey1",...] sighashtype )
+
+== Util ==
+createmultisig nrequired ["key",...]
+estimatefee nblocks
+estimatepriority nblocks
+validateaddress "diviaddress"
+verifymessage "diviaddress" "signature" "message"
+
+== Wallet ==
+addmultisigaddress nrequired ["key",...] ( "account" )
+autocombinerewards true|false ( threshold )
+backupwallet "destination"
+bip38decrypt "diviaddress"
+bip38encrypt "diviaddress"
+dumpprivkey "diviaddress"
+dumpwallet "filename"
+encryptwallet "passphrase"
+getaccount "diviaddress"
+getaccountaddress "account"
+getaddressesbyaccount "account"
+getbalance ( "account" minconf includeWatchonly )
+getnewaddress ( "account" )
+getrawchangeaddress
+getreceivedbyaccount "account" ( minconf )
+getreceivedbyaddress "diviaddress" ( minconf )
+getstakesplitthreshold
+getstakingstatus
+gettransaction "txid" ( includeWatchonly )
+getunconfirmedbalance
+getwalletinfo
+importaddress "address" ( "label" rescan )
+importprivkey "diviprivkey" ( "label" rescan )
+importwallet "filename"
+keypoolrefill ( newsize )
+listaccounts ( minconf includeWatchonly)
+listaddressgroupings
+listlockunspent
+listreceivedbyaccount ( minconf includeempty includeWatchonly)
+listreceivedbyaddress ( minconf includeempty includeWatchonly)
+listsinceblock ( "blockhash" target-confirmations includeWatchonly)
+listtransactions ( "account" count from includeWatchonly)
+listunspent ( minconf maxconf  ["address",...] )
+lockunspent unlock [{"txid":"txid","vout":n},...]
+move "fromaccount" "toaccount" amount ( minconf "comment" )
+multisend <command>
+sendfrom "fromaccount" "todiviaddress" amount ( minconf "comment" "comment-to" )
+sendmany "fromaccount" {"address":amount,...} ( minconf "comment" )
+sendtoaddress "diviaddress" amount ( "comment" "comment-to" )
+sendtoaddressix "diviaddress" amount ( "comment" "comment-to" )
+setaccount "diviaddress" "account"
+setstakesplitthreshold value
+settxfee amount
+signmessage "diviaddress" "message"

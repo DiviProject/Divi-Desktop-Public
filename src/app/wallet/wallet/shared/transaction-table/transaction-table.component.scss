@@ -1,0 +1,196 @@
+@import "./src/assets/_config"; // import shared colors etc.
+
+.mat-expansion-panel {
+  margin-bottom: 20px;
+  box-shadow: none !important;
+  border-bottom: 1px solid $bg-shadow;
+}
+
+.mat-expansion-panel-header {
+  min-height: 76px !important;
+  font-size: 13px;
+  &:hover {
+    background: inherit;
+  }
+  .mat-expansion-panel-header-title {
+    font-family: $font;
+    line-height: 35px;
+  }
+
+  .history_date {
+    font-size: 14px;	
+    letter-spacing: 0.35px;	
+  }
+
+  .history_longAddress {
+    font-size: 14px;	
+    letter-spacing: 0.35px;
+
+    .address {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
+
+  .history_cur_icon {
+    .currency {
+      width: 35px;
+      height: 35px;
+      border-radius: 2px;
+      background: $bg-currency;
+
+      img {
+        width: 19px;
+        height: 19px;
+        color: $color-white;
+        padding: 8px;
+        vertical-align: top;
+      }
+    }
+  }
+
+  .history_actions {
+    img {
+      width: 4px;
+      height: 17px;
+      margin: auto;
+      padding-bottom: 3px;
+    }
+  }
+
+  .history_longAddress {
+    font-size: 14px;	
+    letter-spacing: 0.35px;
+  }
+
+  // confirmations
+  .history_confirmation {
+    .confirmations { // icon
+      height: auto;
+      width: auto;
+      margin-right: 3px;
+      font-size: 12px;
+      position: relative;
+      top: 1px;
+    }
+
+    .confirm {
+      font-size: 12px;	
+      font-weight: 400;	
+      letter-spacing: 0.3px;	
+      line-height: 14px;
+      width: 100px;
+      padding: 10px;
+      border-radius: 2px;
+      height: 15px;
+      text-align: center;
+      text-transform: capitalize;
+
+      &.confirm-none { // unconfirmed TXs
+
+      }
+      &.confirm-1 { // 1-4 confirmations
+        background: $bg-red;
+        color: $color-white;
+      }
+      &.confirm-ok {
+        background: $bg-green;
+        color: $color-white;
+      }
+    }
+  }
+
+  // TX icon
+  .history_cat_icon {
+    .mat-icon {
+      height: auto;
+      width: auto;
+      font-size: 15px;
+      position: relative;
+      top: 3px;
+      margin-right: 12px;
+    }
+    .tx-type {
+      &.staked, &.reward, &.lottery, &.receive {
+        .mat-icon {
+          color: $color-success;
+        }
+      }
+      &.send {
+        .mat-icon {
+          color: $color-alert;
+        }
+      }
+
+      &.moved {
+        img {
+          width: 15px;
+          vertical-align: middle;
+        }
+      }
+    }
+  }
+
+  // TX amount
+  .history_amount {
+    text-align: right;
+    display: block;
+    .amount {
+      font-size: 20px;
+      font-weight: bold;
+
+      .currency {
+        font-weight: 300;
+      }
+    }
+  }
+}
+
+// detail item of TX info
+.tx-detail-item {
+  padding: 5px 0;
+  color: $text-muted;
+  font-size: 13px;
+  font-family: $font;
+  cursor: pointer;
+  // shared across inputs
+  .input {
+    border: none;
+    outline: none;
+    padding: 0 5px;
+  }
+  // to/from address
+  .to-from-address {
+    width: 100%;
+  }
+  // explorer link
+  .tx-detail-link {
+    width: 100%;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    &:hover {
+      color: $color;
+    }
+  }
+}
+
+.history-list-header {
+  .mat-expansion-indicator {
+    margin-left: 10px;
+
+    &.asc {
+      &::after {
+        transform: rotate(45deg);
+      }
+    }
+
+    &.desc {
+      &::after {
+        transform: rotate(225deg);
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+<div *ngIf="blockStatusService.isFullSynced | async" fxLayout="row" fxLayoutGap="10px">
+  <app-amount [tooltip]="tooltips['total'] || 'Total amount you own'" *ngIf="isVisible('total')" fxFlex="1 0 150px" fxFlex.lt-md="100" [value]="balance.total" [type]="getTypeOfBalance()"></app-amount>
+  <app-amount [tooltip]="tooltips['spendable'] || 'Spendable amount'" *ngIf="isVisible('spendable')" fxFlex="1 0 150px" fxFlex.lt-md="100" [mode]="integer" [value]="balance.spendable" [type]="'Spendable'"></app-amount>
+  <app-amount *ngIf="isVisible('unconfirmed')" fxFlex="1 0 150px" fxFlex.lt-md="100" [mode]="integer" [value]="balance.unconfirmed" [type]="'Unconfirmed'"></app-amount>
+  <app-amount *ngIf="isVisible('immature')" fxFlex="1 0 150px" fxFlex.lt-md="100" [mode]="integer" [value]="balance.immature" [type]="'Immature'"></app-amount>
+</div>
+
+<div class="balance" *ngIf="!(blockStatusService.isFullSynced | async)">
+  <span class="number big">Synchronizing...</span>
+</div>

@@ -1,0 +1,30 @@
+@import "./src/assets/_config"; // import shared colors etc.
+
+@import "../shared/_modal-layout"; // shared layout for modals (dialog titles etc.)
+
+.section {
+  &.setup {
+    text-align: center;
+  }
+
+  &.progress {
+    text-align: center;
+  }
+
+  button {
+    margin-top: 40px;
+  }
+}
+
+.tier{
+  width: 370px;
+}
+
+.error-message {
+  color: $color-warning;
+}
+
+.history-logs {
+  list-style: none;
+  padding: 0;
+}

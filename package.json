@@ -1,0 +1,243 @@
+{
+  "name": "divi-desktop",
+  "version": "1.2.2",
+  "license": "GPL-2.0",
+  "description": "Divi Desktop - decentralized marketplace, private currency, messaging & self-governance",
+  "homepage": "https://diviproject.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Divicoin/divi-desktop.git"
+  },
+  "keywords": [
+    "divi",
+    "angular2",
+    "angular4",
+    "angular-cli",
+    "electron",
+    "webpack",
+    "typescript"
+  ],
+  "author": "Divi contributors",
+  "main": "main.js",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "test": "ng test",
+    "lint": "ng lint --type-check && htmlhint --ignore **/documentation/**,**/docs/**,**/packages/** && sass-lint -v",
+    "e2e": "ng e2e",
+    "checksum": "cd packages && checksum -a sha256 *.*",
+    "build:electron:prod": "ng build --base-href=./ --env=prod",
+    "build:electron:fast": "ng build --base-href=./ --sourcemap=false",
+    "build:electron": "ng build --base-href=./",
+    "start:electron:dev": "electron . --dev",
+    "start:electron:dev:tools": "yarn run start:electron:dev --devtools",
+    "start:electron:fast": "yarn run build:electron:fast && electron .",
+    "start:electron": "yarn run build:electron && electron .",
+    "package:mac": "yarn run build:electron:prod && electron-builder -m && yarn run checksum",
+    "package:linux": "yarn run build:electron:prod && electron-builder -l && yarn run checksum",
+    "package:win": "yarn run build:electron:prod && electron-builder --win --x64 && yarn run checksum",
+    "package": "yarn run build:electron:prod && electron-builder -ml && yarn run package:win && yarn run checksum",
+    "coveralls": "cat ./coverage/lcov.info | node ./node_modules/coveralls/bin/coveralls.js",
+    "compodoc": "compodoc -p tsconfig.json -d docs",
+    "publish:win": "yarn run build:electron:prod && build --win --x64 -p always",
+    "publish:linux": "yarn run build:electron:prod && build -l -p always",
+    "publish:mac": "yarn run build:electron:prod && build -m -p always"
+  },
+  "productName": "Divi Desktop",
+  "build": {
+    "electronVersion": "1.7.12",
+    "appId": "com.divi.desktop",
+    "directories": {
+      "buildResources": "resources",
+      "output": "packages"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "modules/**",
+      "dist/**",
+      "resources/**"
+    ],
+    "mac": {
+      "artifactName": "${name}-${version}-${os}.${ext}",
+      "category": "public.app-category.wallet",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "publish": [
+        {
+          "provider": "spaces",
+          "name": "divi-desktop-space",
+          "region": "nyc3",
+          "channel": "latest",
+          "path": "beta",
+          "acl": "public-read"
+        }
+      ]
+    },
+    "dmg": {
+      "background": "background-mac.png",
+      "contents": [
+        {
+          "x": 129,
+          "y": 250
+        },
+        {
+          "x": 410,
+          "y": 247,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "nsis": {
+      "perMachine": true,
+      "oneClick": false
+    },
+    "win": {
+      "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
+      "publish": [
+        {
+          "provider": "spaces",
+          "name": "divi-desktop-space",
+          "region": "nyc3",
+          "channel": "latest",
+          "path": "beta",
+          "acl": "public-read"
+        }
+      ]
+    },
+    "linux": {
+      "maintainer": "divi contributors",
+      "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+      "target": [
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "tar.gz",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "publish": [
+        {
+          "provider": "spaces",
+          "name": "divi-desktop-space",
+          "region": "nyc3",
+          "channel": "latest",
+          "path": "beta",
+          "acl": "public-read"
+        }
+      ],
+      "desktop": {
+        "Comment": "Divi, P2P Privacy ecosystem",
+        "Exec": "divi-desktop %U",
+        "Icon": "divi-desktop",
+        "Name": "Divi",
+        "Path": "/opt/Divi Desktop/",
+        "StartupNotify": "true",
+        "Terminal": "false",
+        "Type": "Application",
+        "Categories": "P2P;Finance;Security"
+      },
+      "category": "Finance",
+      "packageCategory": "wallet",
+      "icon": "resources/linux"
+    },
+    "asar": true
+  },
+  "dependencies": {
+    "@angular/animations": "^5.2.5",
+    "@angular/cdk": "^5.2.1",
+    "@angular/common": "^5.2.5",
+    "@angular/compiler": "^5.2.5",
+    "@angular/core": "^5.2.5",
+    "@angular/flex-layout": "2.0.0-beta.12",
+    "@angular/forms": "^5.2.5",
+    "@angular/http": "^5.2.5",
+    "@angular/material": "^5.2.1",
+    "@angular/platform-browser": "^5.2.5",
+    "@angular/platform-browser-dynamic": "^5.2.5",
+    "@angular/platform-server": "^5.2.5",
+    "@angular/router": "^5.2.5",
+    "angularx-qrcode": "^1.0.1",
+    "bluebird": "^3.4.7",
+    "buffered-spawn": "^3.3.2",
+    "cli-progress": "^1.7.0",
+    "core-js": "^2.4.1",
+    "electron-fetch": "^1.2.0",
+    "electron-log": "^2.2.14",
+    "electron-native-notification": "^1.2.1",
+    "electron-updater": "3.0.3",
+    "font-awesome": "^4.7.0",
+    "got": "^8.1.0",
+    "hammerjs": "^2.0.8",
+    "json2csv": "^4.3.2",
+    "lodash": "^4.17.5",
+    "lodash.get": "^4.4.2",
+    "lodash.isempty": "^4.4.0",
+    "lodash.values": "^4.3.0",
+    "ng2-logger": "^1.0.11",
+    "ngx-clipboard": "^10.0.0",
+    "node-unzip-2": "^0.2.1",
+    "open-sans-all": "^0.1.3",
+    "request": "^2.87.0",
+    "request-promise": "^4.2.2",
+    "rx-ipc-electron": "^0.1.2",
+    "rxjs": "^5.5.6",
+    "tmp": "^0.0.33",
+    "zone.js": "^0.8.20"
+  },
+  "devDependencies": {
+    "@angular/cli": "^1.6.8",
+    "@angular/compiler-cli": "^5.2.5",
+    "@compodoc/compodoc": "^1.0.7",
+    "@types/jasmine": "^2.8.6",
+    "@types/node": "^9.4.6",
+    "checksum": "^0.1.1",
+    "codelyzer": "^4.1.0",
+    "coveralls": "^3.0.0",
+    "electron": "1.7.12",
+    "electron-builder": "20.22.0",
+    "electron-publisher-s3": "^20.17.2",
+    "htmlhint": "^0.9.13",
+    "jasmine-core": "^2.99.1",
+    "jasmine-spec-reporter": "^4.2.0",
+    "karma": "^2.0.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-cli": "^1.0.1",
+    "karma-coverage-istanbul-reporter": "^1.4.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-jasmine-html-reporter": "^0.2.2",
+    "node-sass": "^4.9.2",
+    "protractor": "^5.3.0",
+    "sass-lint": "^1.10.2",
+    "ts-node": "^5.0.0",
+    "tslint": "^5.9.0",
+    "tslint-microsoft-contrib": "^5.0.3",
+    "typescript": ">=2.4.2 <2.6.0"
+  }
+}

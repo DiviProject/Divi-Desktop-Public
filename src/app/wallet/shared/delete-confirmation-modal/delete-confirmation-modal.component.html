@@ -1,0 +1,24 @@
+<div mat-dialog-title>{{title}}</div>
+<button class="small-close_button" (click)="dialogClose()">
+  <mat-icon fontSet="partIcon" fontIcon="part-circle-remove"></mat-icon>
+</button>
+
+<div mat-dialog-content class="dialog-content">
+  <p>
+    {{message}}
+  </p>
+  <p>
+    {{ dialogContent }}
+  </p>
+</div>
+
+<mat-dialog-actions fxLayoutAlign="end center">
+  <button mat-button mat-dialog-close (click)="onConfirmCancel()">
+    <mat-icon fontSet="partIcon" fontIcon="part-cross"></mat-icon>
+    Cancel
+  </button>
+  <button mat-raised-button color="warn" mat-dialog-close (click)="onConfirmDelete()">
+    <mat-icon fontSet="partIcon" fontIcon="part-circle-remove"></mat-icon>
+    {{deleteButtonContent}}
+  </button>
+</mat-dialog-actions>

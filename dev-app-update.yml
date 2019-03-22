@@ -1,0 +1,6 @@
+provider: spaces
+name: divi-desktop-space
+region: nyc3
+channel: latest
+path: beta
+acl: public-read

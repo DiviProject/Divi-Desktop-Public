@@ -1,0 +1,28 @@
+<div class="container disable-select">
+  <div class="content">
+    <div class="section progress">
+      <div class="title">Auto Update</div>
+
+      <ul class="history-logs">
+        <li *ngFor="let log of updateService.historyLogs; let i = index">
+          {{log}}
+        </li>
+      </ul>
+
+      <div class="actions">
+        <button mat-raised-button 
+          color="primary" 
+          (click)="updateService.update()"
+          *ngIf="dialogRef.componentInstance.enableClose">
+          Download & Install
+        </button>
+        <button mat-raised-button 
+                color="primary" 
+                (click)="close()"
+                *ngIf="dialogRef.componentInstance.enableClose">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,203 @@
+== Addressindex ==
+getaddressbalance addresses
+getaddressdeltas addresses
+getaddressmempool addresses
+getaddresstxids addresses
+getaddressutxos addresses
+
+== Anon ==
+anonoutput [index/hex]
+
+== Blockchain ==
+getbestblockhash
+getblock "blockhash" ( verbosity )
+getblockchaininfo
+getblockcount
+getblockdeltas <blockhash>
+getblockhash height
+getblockhashes high low options
+getblockheader "hash" ( verbose )
+getchaintips
+getchaintxstats ( nblocks blockhash )
+getdifficulty
+getmempoolancestors txid (verbose)
+getmempooldescendants txid (verbose)
+getmempoolentry txid
+getmempoolinfo
+getrawmempool ( verbose )
+getspentinfo inputs
+gettxout "txid" n ( include_mempool )
+gettxoutproof ["txid",...] ( blockhash )
+gettxoutsetinfo
+gettxoutsetinfobyscript
+preciousblock "blockhash"
+pruneblockchain
+savemempool
+verifychain ( checklevel nblocks )
+verifytxoutproof "proof"
+
+== Control ==
+getmemoryinfo ("mode")
+help ( "command" )
+logging ( <include> <exclude> )
+stop
+uptime
+
+== Generating ==
+generate nblocks ( maxtries )
+generatetoaddress nblocks address (maxtries)
+
+== Governance ==
+setvote proposal option height_start height_end
+tallyvotes proposal height_start height_end
+votehistory ( current_only )
+
+== Mining ==
+getblocktemplate ( TemplateRequest )
+getmininginfo
+getnetworkhashps ( nblocks height )
+prioritisetransaction <txid> <dummy value> <fee delta>
+submitblock "hexdata"  ( "dummy" )
+
+== Mnemonic ==
+mnemonic new|decode|addchecksum|dumpwords|listlanguages
+
+== Network ==
+addnode "node" "add|remove|onetry"
+clearbanned
+disconnectnode "[address]" [nodeid]
+getaddednodeinfo ( "node" )
+getconnectioncount
+getnettotals
+getnetworkinfo
+getpeerinfo
+listbanned
+ping
+setban "subnet" "add|remove" (bantime) (absolute)
+setnetworkactive true|false
+
+== Rawtransactions ==
+combinerawtransaction ["hexstring",...]
+createrawtransaction [{"txid":"id","vout":n},...] {"address":amount,"data":"hex",...} ( locktime ) ( replaceable )
+decoderawtransaction "hexstring" ( iswitness )
+decodescript "hexstring"
+fundrawtransaction "hexstring" ( options iswitness )
+getrawtransaction "txid" ( verbose "blockhash" )
+sendrawtransaction "hexstring" ( allowhighfees )
+signrawtransaction "hexstring" ( [{"txid":"id","vout":n,"scriptPubKey":"hex","redeemScript":"hex"},...] ["privatekey1",...] sighashtype )
+
+== Smsg ==
+smsg "msgid" ( options )
+smsgaddaddress "address" "pubkey"
+smsgaddlocaladdress "address"
+smsgbuckets ( stats|dump )
+smsgdisable
+smsgenable
+smsggetpubkey "address"
+smsgimportprivkey "privkey" ( "label" )
+smsginbox ( "mode" "filter" )
+smsglocalkeys ( whitelist|all|wallet|recv +/- "address"|anon +/- "address" )
+smsgoptions ( list with_description|set "optname" "value" )
+smsgoutbox ( "mode" "filter" )
+smsgscanbuckets
+smsgscanchain
+smsgsend "address_from" "address_to" "message" ( paid_msg days_retention testfee )
+smsgsendanon "address_to" "message"
+smsgview  ( "address/label"|(asc/desc|-from yyyy-mm-dd|-to yyyy-mm-dd) )
+
+== Util ==
+createmultisig nrequired ["key",...]
+estimatefee nblocks
+estimatesmartfee conf_target ("estimate_mode")
+signmessagewithprivkey "privkey" "message"
+validateaddress "address"
+verifymessage "address" "signature" "message"
+
+== Wallet ==
+abandontransaction "txid"
+abortrescan
+addmultisigaddress nrequired ["key",...] ( "account", bech32, 256bit)
+backupwallet "destination"
+buildscript json
+bumpfee "txid" ( options )
+clearwallettransactions ( remove_all )
+createsignaturewithwallet "hexstring" "prevtx" "address" "sighashtype"
+debugwallet ( attempt_repair )
+derivefromstealthaddress "stealthaddress"
+deriverangekeys start ( end "key/id" hardened save add_to_addressbook 256bithash )
+dumpprivkey "address"
+dumpwallet "filename"
+encryptwallet "passphrase"
+extkey "mode"
+extkeyaltversion "ext_key"
+extkeygenesisimport "mnemonic/key" ( "passphrase" save_bip44_root master_label account_label scan_chain_from )
+extkeyimportmaster "mnemonic/key" ( "passphrase" save_bip44_root master_label account_label scan_chain_from )
+filteraddresses ( offset count sort_code "match_str" match_owned show_path )
+getaccount "address"
+getaccountaddress "account"
+getaddressesbyaccount "account"
+getbalance ( "account" minconf include_watchonly )
+getcoldstakinginfo
+getnewaddress ( "account" bech32 hardened 256bit )
+getnewextaddress ( "label" childNo bech32 hardened )
+getnewstealthaddress ( "label" num_prefix_bits prefix_num bech32 makeV2 )
+getrawchangeaddress ( "address_type" )
+getreceivedbyaccount "account" ( minconf )
+getreceivedbyaddress "address" ( minconf )
+getstakinginfo
+gettransaction "txid" ( include_watchonly )
+getunconfirmedbalance
+getwalletinfo
+importaddress "address" ( "label" rescan p2sh )
+importmulti "requests" ( "options" )
+importprivkey "privkey" ( "label" ) ( rescan )
+importprunedfunds
+importpubkey "pubkey" ( "label" rescan )
+importstealthaddress "scan_secret" "spend_secret" ( "label" num_prefix_bits prefix_num bech32 )
+importwallet "filename"
+keypoolrefill ( newsize )
+listaccounts ( minconf include_watchonly)
+listaddressgroupings
+listlockunspent
+listreceivedbyaccount ( minconf include_empty include_watchonly)
+listreceivedbyaddress ( minconf include_empty include_watchonly)
+listsinceblock ( "blockhash" target_confirmations include_watchonly include_removed )
+liststealthaddresses ( show_secrets=0 )
+listtransactions ( "account" count skip include_watchonly)
+listunspent ( minconf maxconf  ["addresses",...] [include_unsafe] [query_options])
+listunspentanon ( minconf maxconf  ["addresses",...] [include_unsafe] )
+listunspentblind ( minconf maxconf  ["addresses",...] [include_unsafe] )
+listwallets
+lockunspent unlock ([{"txid":"txid","vout":n},...])
+manageaddressbook "action" "address" ( "label" "purpose" )
+move "fromaccount" "toaccount" amount ( minconf "comment" )
+removeprunedfunds "txid"
+rescanblockchain ("start_height") ("stop_height")
+reservebalance reserve ( amount )
+rewindchain ( height )
+scanchain [from_height]
+sendanontoanon "address" amount ( "comment" "comment-to" subtractfeefromamount "narration" ringsize inputs_per_sig)
+sendanontoblind "address" amount ( "comment" "comment-to" subtractfeefromamount "narration" ringsize inputs_per_sig)
+sendanontopart "address" amount ( "comment" "comment-to" subtractfeefromamount "narration" ringsize inputs_per_sig)
+sendblindtoanon "address" amount ( "comment" "comment-to" subtractfeefromamount "narration")
+sendblindtoblind "address" amount ( "comment" "comment-to" subtractfeefromamount "narration")
+sendblindtopart "address" amount ( "comment" "comment-to" subtractfeefromamount "narration")
+sendmany "fromaccount" {"address":amount,...} ( minconf "comment" ["address",...] replaceable conf_target "estimate_mode")
+sendparttoanon "address" amount ( "comment" "comment-to" subtractfeefromamount "narration")
+sendparttoblind "address" amount ( "comment" "comment-to" subtractfeefromamount "narration")
+sendtoaddress "address" amount ( "comment" "comment-to" subtractfeefromamount "narration" replaceable conf_target "estimate_mode")
+sendtypeto "typein" "typeout" [{address: , amount: , narr: , subfee:},...] ("comment" "comment-to" ringsize inputs_per_sig test_fee coin_control)
+setaccount "address" "account"
+settxfee amount
+signmessage "address" "message"
+transactionblinds "txnid"
+walletlock
+walletpassphrase "passphrase" timeout ( stakingonly )
+walletpassphrasechange "oldpassphrase" "newpassphrase"
+walletsettings "setting" json
+
+== Zmq ==
+getnewzmqserverkeypair
+
+Enter 'help' for an overview of available commands
+Enter 'help' for an overview of available commands

@@ -1,0 +1,56 @@
+@import "./src/assets/_config"; // import shared colors etc.
+
+.container-block {
+  padding-top: 0;
+
+  .history-header {
+    .transactions-count {
+      .count {
+        font-size: 34px;	
+        font-weight: 300;	
+        letter-spacing: 0.34px;	
+        line-height: 40px;
+      }
+    
+      .lable {
+        font-size: 12px;	
+        letter-spacing: 0.3px;	
+        line-height: 14px;
+      }
+    }
+    
+    .category-list {
+      list-style: none;
+      padding: 0;
+      text-align: right;
+  
+      .category-item {
+        cursor: pointer;
+        opacity: 0.5;
+        font-size: 11px;	
+        font-weight: bold;	
+        letter-spacing: 0.41px;
+        display: inline-block;
+        padding: 10px;
+        text-transform: uppercase;
+
+        &:last-child {
+          padding-right: 0px;
+        }
+    
+        &.active {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  transaction-table {
+    width: 100%;
+  }
+}
+
+.export-to-csv {
+  margin: 0.3em 0 1.25em 1em;
+  font-size: 12px;
+}

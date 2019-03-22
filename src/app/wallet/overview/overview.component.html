@@ -1,0 +1,23 @@
+<div class="overview-content">
+  <div class="wallet-status" *ngIf="!walletInited">
+    {{walletLoadingStatus}}
+  </div>
+
+  <div class="balance-item" *ngIf="walletInited"> 
+    <app-balance type="balance" [types]="['total', 'spendable']"></app-balance>
+  </div>
+
+  <mat-tab-group [@.disabled]="true" *ngIf="walletInited">
+    <mat-tab [@.disabled]="true" label="Recent Transactions">
+      <div class="recent-transactions" fxFlex="100">
+        <app-header>
+          <ul class="header-nav">
+            <li>Recent Transactions</li>
+          </ul>
+        </app-header>
+        <transaction-table [display]="{'txDisplayAmount': 5, 'header': false, 'internalHeader': true, 'category': true, 'confirmations': true, 'currency': true}">
+        </transaction-table>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div><!-- .overview-content -->

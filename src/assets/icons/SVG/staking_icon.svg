@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="86px" height="96px" viewBox="0 0 86 96" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.2 (67145) - http://www.bohemiancoding.com/sketch -->
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="staking-icon" fill="#000000" fill-rule="nonzero">
+            <path d="M81,21.1 L47.3,1.7 C44.6,0.2 41.3,0.2 38.7,1.7 L5,21.1 C2.3,22.6 0.7,25.5 0.7,28.6 L0.7,67.5 C0.7,70.6 2.4,73.4 5,75 L38.7,94.4 C40,95.2 41.5,95.6 43,95.6 C44.5,95.6 46,95.2 47.3,94.4 L81,74.9 C83.7,73.4 85.3,70.5 85.3,67.4 L85.3,28.6 C85.3,25.5 83.6,22.6 81,21.1 Z M42.1,7.6 C42.4,7.4 42.7,7.4 43,7.4 C43.3,7.4 43.6,7.5 43.9,7.6 L75,25.6 L43,44 L11,25.6 L42.1,7.6 Z M8.5,69 C8,68.7 7.6,68.1 7.6,67.5 L7.6,31.5 L39.6,50 L39.6,86.9 L8.5,69 Z M77.5,69 L46.4,87 L46.4,50 L78.4,31.5 L78.4,67.4 C78.4,68.1 78.1,68.6 77.5,69 Z" id="Shape"></path>
+        </g>
+    </g>
+</svg>

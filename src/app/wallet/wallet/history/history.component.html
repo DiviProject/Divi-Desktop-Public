@@ -1,0 +1,36 @@
+<div class="container-block">
+  <div fxLayout="row">
+    <mat-form-field floatPlaceholder="never" class="sort-select">
+      <mat-select placeholder="Sort by"
+                  (change)="sort($event.value)"
+                  [(ngModel)]="sortby">
+        <mat-option *ngFor="let fld of sortFields" [value]="fld.value">
+          {{ fld.title }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button mat-button (click)="onExportToCsvClick()" class="export-to-csv">
+      <mat-icon fontSet="partIcon" fontIcon="part-send"></mat-icon>
+      Export To Csv
+    </button>
+  </div>
+  <div class="history-header" fxLayout="row">
+    <div class="transactions-count" fxFlex="20">
+        <span class="count">
+          {{txService.txCount}}
+        </span>
+        <span class="label">Transactions</span>
+      </div>
+  
+      <ul class="category-list" fxFlex="80">
+        <li (click)="changeCategory(i)" *ngFor="let category of categories; let i = index" class="category-item" [ngClass]="{ 'active': i === selectedTab }">
+            {{ category.title }}
+        </li>
+      </ul>
+  </div>
+  <div class="tx-list section" fxLayout="row">
+    <transaction-table #transactions
+                       [display]="{'header': false, 'internalHeader': true, 'pagination': true, 'category': true, 'expand': true, 'currency': true}">
+    </transaction-table>
+  </div><!-- .tx-list -->
+</div>
