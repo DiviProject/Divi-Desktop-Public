@@ -10,9 +10,7 @@
 &nbsp;* Console access
 * Blockchain "Primer"
 *The blockchain "Primer" serves as a method for out-of-sync wallets to quickly regain sync status.*
-* MOCCI email notifications
 
 ## 🐛 Bugfixes
-* MOCCI stability improvements
 * Minor UI updates
 * Minor security updates
