@@ -122,12 +122,16 @@ export class RpcStateService extends StateService implements OnDestroy {
   private walletEncryptionStatusChange() {
     this.observe('getwalletinfo', 'encryptionstatus')
       .takeWhile(() => !this.destroyed)
-      .subscribe(status => {
-        this.set('locked', ['Locked', 'Unlocked, staking only'].includes(status));
-
+      .subscribe(async status => {
         if (['Unencrypted', 'Unlocked, staking only', 'Unlocked'].includes(status)) {
           this.stateCall('getstakinginfo');
+
+          //cache hdseed
+          const { hdseed } = await (this._rpc.call('dumphdinfo').toPromise());
+          this.set('hdseed', hdseed);
         }
+
+        this.set('locked', ['Locked', 'Unlocked, staking only'].includes(status));
       });
   }
 

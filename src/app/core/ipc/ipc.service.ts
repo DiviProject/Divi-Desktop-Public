@@ -100,6 +100,7 @@ export class IpcService {
               observer.complete(); // only do this with ipc.once
               break;
             case 'e':
+              data = data || {};
               observer.error((<any>data).error ? (<any>data).error : data);
               break;
             case 'c':

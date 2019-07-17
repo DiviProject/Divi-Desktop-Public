@@ -8,6 +8,8 @@ import { environment } from '../../../environments/environment';
 import { RpcStateService } from '../../core';
 import { ModalsService } from '../../modals/modals.module';
 import { AppSettingsService } from 'app/core/services/app-settings.service';
+import { PrimerService } from 'app/core/services/primer.service';
+import { DaemonService } from 'app/core/daemon/daemon.service';
 
 /*
  * The MainView is basically:
@@ -39,6 +41,7 @@ export class MainViewComponent implements OnInit, OnDestroy {
   clientVersion: string = environment.version;
   unSubscribeTimer: any;
   time: string = '5:00';
+  primerModalShown: boolean;
   public unlocked_until: number = 0;
   public encryptionStatus: string = null;
 
@@ -47,10 +50,21 @@ export class MainViewComponent implements OnInit, OnDestroy {
     private _route: ActivatedRoute,
     private _rpcState: RpcStateService,
     private _modals: ModalsService,
-    private appSettingsService: AppSettingsService
+    private appSettingsService: AppSettingsService,
+    private primerService: PrimerService,
+    private daemonService: DaemonService
   ) { }
 
   ngOnInit() {
+    this.primerService.onAutoRestore.subscribe(() => {
+      if (!this.primerModalShown) {
+        this._modals.open('primer', { forceOpen: true });
+        this.primerModalShown = true;
+      }
+    });
+    this.primerService.init();
+    this.daemonService.init();
+
     // Change the header title derived from route data
     // Source: https://toddmotto.com/dynamic-page-titles-angular-2-router-events
     this._router.events
@@ -71,9 +85,7 @@ export class MainViewComponent implements OnInit, OnDestroy {
     // Updates the error box in the sidenav whenever a stateCall returns an error.
     this._rpcState.observe(RpcStateService.DAEMON_STARTED_KEY)
       .takeWhile(_ => !this.destroyed)
-      .subscribe(isStarted => {
-          this.daemonRunning = isStarted;
-      });
+      .subscribe(isStarted => this.daemonRunning = isStarted);
 
     // Updates the error box in the sidenav if wallet is not initialized.
     this._rpcState.observe('ui:walletInitialized')
@@ -95,9 +107,7 @@ export class MainViewComponent implements OnInit, OnDestroy {
       
     this._rpcState.observe('getwalletinfo', 'encryptionstatus')
       .takeWhile(() => !this.destroyed)
-      .subscribe(status => {        
-        this.encryptionStatus = status;
-      });
+      .subscribe(status => this.encryptionStatus = status);
       
     /* versions */
     // Obtains the current daemon version
@@ -108,9 +118,7 @@ export class MainViewComponent implements OnInit, OnDestroy {
 
     this.appSettingsService.onNetChangeObs
       .takeWhile(() => !this.destroyed)
-      .subscribe(net => {
-        this.testnet = net === 'test';
-      });
+      .subscribe(net => this.testnet = net === 'test');
 
     this.appSettingsService.init();
   }

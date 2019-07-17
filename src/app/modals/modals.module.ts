@@ -33,6 +33,12 @@ import { ReleaseNotesComponent } from './release-notes/release-notes.component';
 import { WalletVerifyResultComponent } from './wallet-verify-result/wallet-verify-result.component';
 import { ShutdownComponent } from './shutdown/shutdown.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
+import { Verify2faComponent } from './verify-2fa/verify-2fa.component';
+import { PrimerComponent } from './primer/primer.component';
+import { TfaSettingsComponent } from './tfa-settings/tfa-settings.component';
+import { Setup2faComponent } from './tfa-settings/setup-2fa/setup-2fa.component';
+import { Update2faComponent } from './tfa-settings/update-2fa/update-2fa.component';
+import { TfaScopesComponent } from './tfa-settings/tfa-scopes/tfa-scopes.component';
 
 @NgModule({
   imports: [
@@ -62,7 +68,14 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
     ReleaseNotesComponent,
     WalletVerifyResultComponent,
     ShutdownComponent,
-    ChangePasswordComponent
+    ChangePasswordComponent,
+    PrimerComponent,
+
+    Verify2faComponent,
+    TfaScopesComponent,
+    Setup2faComponent,
+    Update2faComponent,
+    TfaSettingsComponent
   ],
   exports: [
     ModalsComponent,
@@ -87,7 +100,14 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
     ReleaseNotesComponent,
     WalletVerifyResultComponent,
     ShutdownComponent,
-    ChangePasswordComponent
+    ChangePasswordComponent,
+    PrimerComponent,
+
+    Verify2faComponent,
+    TfaScopesComponent,
+    Setup2faComponent,
+    Update2faComponent,
+    TfaSettingsComponent
   ],
 })
 export class ModalsModule {

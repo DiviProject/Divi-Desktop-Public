@@ -1,0 +1,19 @@
+@import "./src/assets/_config"; // import shared colors etc.
+
+.update-2fa {
+  text-align: center;
+  
+  .error-message {
+    color: $color-alert;
+  }
+
+  .scopes {
+    max-width: 300px;
+    text-align: left;
+  }
+
+  .actions {
+    margin-left: -10px;
+    margin-top: 20px;
+  }
+}

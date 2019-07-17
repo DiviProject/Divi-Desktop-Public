@@ -32,19 +32,11 @@ export class PassphraseService {
     return this.validWords.indexOf(word) !== -1;
   }
 
-  importMnemonic(words: string[]) {
-    return Observable.create((obs) => {
-      this.daemonService.stop().subscribe(() => {
-        this._rpc.call('cleanup-for-resore').subscribe(() => {
-          this.daemonService.restart(['-mnemonic=' + words.join(' '), '-reindex'])
-            .subscribe(() => {
-              localStorage.setItem('wallet:is-backed-up', 'true');
-              obs.next();
-              obs.complete();
-            }, obs.error);
-        }, obs.error);
-      });
-    });
+  async importMnemonic(words: string[]): Promise<void> {
+    await (this.daemonService.stop().toPromise());
+    await (this._rpc.call('cleanup-for-resore').toPromise());
+    await (this.daemonService.restart(['-mnemonic=' + words.join(' '), '-reindex']).toPromise());
+    localStorage.setItem('wallet:is-backed-up', 'true');
   }
 
   generateDefaultAddresses() {

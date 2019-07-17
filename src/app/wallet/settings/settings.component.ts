@@ -1,18 +1,17 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Location } from '@angular/common';
 
-import { SettingsService } from './settings.service';
 import { ModalsService } from '../../modals/modals.module';
-import { RpcService, RpcStateService, DaemonService, SnackbarService, DiviService, AppSettingsService } from '../../core';
+import { RpcService, RpcStateService, DaemonService, SnackbarService, DiviService, AppSettingsService, SettingsService } from '../../core';
 import { environment } from '../../../environments/environment';
+import { UserSettingsService } from 'app/core/services/user-settings.service';
+import { UserInfoService } from 'app/core/services/user-info.service';
+import { AuthScopes } from 'app/core/models/auth-scopes.enum';
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss'],
-  providers: [
-    SettingsService
-  ]
+  styleUrls: ['./settings.component.scss']
 })
 
 export class SettingsComponent implements OnInit, OnDestroy {
@@ -22,12 +21,25 @@ export class SettingsComponent implements OnInit, OnDestroy {
   settings: Object;
   hasChanged: boolean = false;
 
+  public isLocked: boolean = true;
   public testnet: boolean;
   public daemonVersion: string;
   public clientVersion: string = environment.version;
   public encryptionStatus: string = null;
   private destroyed: boolean = false;
   public walletInited: boolean = false;
+  
+  public userSettings: {
+    twoFactorAuthEnabled: boolean,
+    twoFactorAuthScopes: string,
+    twoFactorAuthScopesTemp: string
+  } = null; 
+
+  public userInfo: {
+    email: string,
+    userName: string,
+    isSubscribed: boolean
+  } = null; 
 
   constructor(
     private _settingsService: SettingsService,
@@ -38,22 +50,21 @@ export class SettingsComponent implements OnInit, OnDestroy {
     private _rpcState: RpcStateService,
     private flashNotificationService: SnackbarService,
     private daemonService: DaemonService,
-    private appSettingsService: AppSettingsService
+    private appSettingsService: AppSettingsService,
+    private userSettingsService: UserSettingsService,
+    private userInfoService: UserInfoService
   ) { }
 
   ngOnInit() {
-    /* Preload default settings if none found */
-    if (localStorage.getItem('settings') == null) {
-      const settings: string = JSON.stringify(this._settingsService.defaultSettings);
-      localStorage.setItem('settings', settings);
-    }
     this.settings = this._settingsService.loadSettings();
 
     this._rpcState.observe('getwalletinfo', 'encryptionstatus')
       .takeWhile(() => !this.destroyed)
-      .subscribe(encryptionstatus => {
-        this.encryptionStatus = encryptionstatus;
-      });
+      .subscribe(encryptionstatus => this.encryptionStatus = encryptionstatus);
+
+    this._rpcState.observe('locked')
+      .takeWhile(() => !this.destroyed)
+      .subscribe(isLocked => this.onLockedStateChanged(isLocked));
 
     this._rpcState.observe('getnetworkinfo', 'subversion')
       .takeWhile(() => !this.destroyed)
@@ -69,6 +80,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this._rpcState.observe('ui:walletInitialized')
       .takeWhile(() => !this.destroyed)
       .subscribe(status => this.walletInited = status);
+
+    //const walletInfo = this._rpcState.get('getwalletinfo') || {};
+    this.onLockedStateChanged(this._rpcState.get('locked'));
   }
 
   ngOnDestroy() {
@@ -80,6 +94,25 @@ export class SettingsComponent implements OnInit, OnDestroy {
     if (tab === 'help') {
       // const dialogRef = this.dialog.open(ConsoleModalComponent);
     }
+  }
+
+  async onLockedStateChanged(isLocked: boolean): Promise<void> {
+    this.isLocked = isLocked != undefined ? isLocked : this.isLocked;
+    
+    if (isLocked != undefined && !isLocked) {
+      await this.initUserSettings();
+      await this.initUserInfo();
+    }
+  }
+
+  async initUserSettings(): Promise<void> {
+    this.userSettings = await this.userSettingsService.getSettings();
+    this.userSettings.twoFactorAuthScopesTemp = this.userSettings.twoFactorAuthScopes;
+    this._rpcState.set('userSettings', this.userSettings);
+  }
+
+  async initUserInfo(): Promise<void> {
+    this.userInfo = await this.userInfoService.getInfo();
   }
 
   save() {
@@ -95,17 +128,41 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this._modals.open('walletVerifyResult', { forceOpen: true, verified: verified });
   }
 
-  verifyWallet(): void {
-    if (this._rpcState.get('locked')) {
-      this._modals.open('unlock', {forceOpen: true, timeout: 30, callback: this.verifyWallet.bind(this)});
-    } else {
-      this._rpc.call('walletverify').subscribe((result: boolean) => {
-        this.showWalletVerifyModal(result);
-      }, (err) => {
-        console.error(err);
-        this.showWalletVerifyModal(false);
-      });
+  async verifyWallet(): Promise<void> {
+    const isUnlocked = await this._modals.unlock(AuthScopes.WALLET_VERIFY);
+    
+    if (!isUnlocked) {
+      return;
     }
+
+    this._rpc.call('walletverify').subscribe((result: boolean) => {
+      this.showWalletVerifyModal(result);
+    }, (err) => {
+      console.error(err);
+      this.showWalletVerifyModal(false);
+    });
+  }
+
+  checkEmail(): boolean {
+    if (!this.userInfo) return false;
+
+    const regexp = new RegExp('[a-zA-Z0-9_\\.\\+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-\\.]+'), test = regexp.test(this.userInfo.email);
+
+    return test;
+  }
+
+  async updateUserInfo(): Promise<void> {
+    let alertMessage = 'Email and username accepted, we will notify you if your nodes go down. Thank you.';
+
+    if (this.userInfo.isSubscribed) {
+      await this.userInfoService.subscribe();
+    } else {
+      await this.userInfoService.unsubscribe();
+      alertMessage = 'Email and username accepted, we won\'t notify you if your nodes go down. Thank you.';
+    }
+
+    await this.userInfoService.create(this.userInfo.email, this.userInfo.userName);
+    this.flashNotificationService.open(alertMessage);
   }
 
   changePassword() {
@@ -116,12 +173,14 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this._modals.open('createWallet', { data: { step: 4, disableBack: true, isRestore: true }, forceOpen: true });
   }
 
-  backup() {
-    if (this._rpcState.get('locked')) {
-      this._modals.open('unlock', {forceOpen: true, timeout: 30, callback: this.openBackupModal.bind(this)});
-    } else {
-      this.openBackupModal();
+  async backup(): Promise<void> {
+    const isUnlocked = await this._modals.unlock(AuthScopes.BACKUP);
+
+    if (!isUnlocked) {
+      return;
     }
+
+    this.openBackupModal();
   }
 
   restartDaemon(args: Array<string> = []): void {
@@ -165,8 +224,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
       error => console.error('walletlock error', error));
   }
 
-  unlockwallet() {
-    this._modals.open('unlock', { forceOpen: true, showStakeOnly: true });
+  async unlockwallet(showStakeOnly: boolean = true): Promise<void> {
+    await this._modals.unlock(AuthScopes.UNLOCK_WALLET, null, showStakeOnly);
   }
 
   clearCache() {
@@ -176,5 +235,21 @@ export class SettingsComponent implements OnInit, OnDestroy {
         this.daemonService.restart().subscribe(() => {});
       });
     });
+  }
+
+  onPrimerRestoreClick(): void {
+    this._modals.open('primer', { forceOpen: true });
+  }
+
+  async onSetup2faClick(): Promise<void> {
+    const isUnlocked = await this._modals.unlock(AuthScopes.SETUP_TFA, { description: 'Please unlock your wallet to begin setting up 2-factor authentication.' });
+
+    if (!isUnlocked) {
+      return;
+    }
+
+    const modal = this._modals.open('tfaSettings', { forceOpen: true });
+    await (modal.beforeClose().toPromise());
+    await this.initUserSettings();
   }
 }

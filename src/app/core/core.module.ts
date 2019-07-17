@@ -20,6 +20,11 @@ import { InvocationService } from './services/invocation.service';
 import { ExportService } from './services/export.service';
 import { SecutiyService } from './services/security.service';
 import { AppSettingsService } from './services/app-settings.service';
+import { Auth2faService } from './services/auth-2fa.service';
+import { UserInfoService } from './services/user-info.service';
+import { UserSettingsService } from './services/user-settings.service';
+import { PrimerService } from './services/primer.service';
+import { SettingsService } from './services/settings.service';
 
   /*
     Loading the core library will intialize IPC & RPC
@@ -46,6 +51,8 @@ export class CoreModule {
         UpdateService,
         CacheService,
         DaemonService,
+        PrimerService,
+        SettingsService,
 
         DiviService,
         BalanceService,
@@ -54,7 +61,11 @@ export class CoreModule {
         InvocationService,
         ExportService,
         SecutiyService,
-        AppSettingsService
+        AppSettingsService,
+
+        Auth2faService,
+        UserInfoService,
+        UserSettingsService
       ]
     };
   }

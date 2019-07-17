@@ -3,6 +3,7 @@ Changelog for Divi Desktop Wallet
 1.0.1
 BUGS
   - Fixed bug with balances.
+  - Fixed bug with 'stake' tab in history.
   - Fixed bug with amount in transactions.
 
 IMPROVEMENTS
@@ -10,3 +11,4 @@ IMPROVEMENTS
 
 FEATURES
   - Added support for Testnet.
+  - Added 'Lottery' tab in history.

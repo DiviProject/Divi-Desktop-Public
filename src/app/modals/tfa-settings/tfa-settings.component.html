@@ -1,0 +1,14 @@
+<div class="container">
+  <div class="content tfa-settings">
+    <div class="title">Setup 2-Factor Authentication</div>
+
+    <div fxLayout="row" fxLayoutGap="20px" style="margin-bottom: 10px;" *ngIf="!!userSettings">
+      <ng-container *ngIf="!userSettings.twoFactorAuthEnabled">
+        <app-setup-2fa (onSuccess)="onTfaChanged()" (onClose)="onClose()"></app-setup-2fa>
+      </ng-container>
+      <ng-container *ngIf="!!userSettings.twoFactorAuthEnabled">
+        <app-update-2fa (onChange)="onTfaChanged()" (onClose)="onClose()"></app-update-2fa>
+      </ng-container>
+    </div>
+  </div><!-- .content -->
+</div><!-- .container -->

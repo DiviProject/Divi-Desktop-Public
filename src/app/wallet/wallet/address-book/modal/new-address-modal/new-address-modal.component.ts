@@ -9,6 +9,7 @@ import { ModalsService } from '../../../../../modals/modals.service';
 
 import { AddressService } from '../../../shared/address.service';
 import { Address } from '../../../shared/address.model';
+import { AuthScopes } from 'app/core/models/auth-scopes.enum';
 
 @Component({
   selector: 'app-new-address-modal',
@@ -90,7 +91,7 @@ export class NewAddressModalComponent implements OnInit {
   /**
    * Adds the address to the addressbook if address is valid & has label (in UI textbox) AND is not one of our own addresses.
    */
-  onSubmitForm(): void {
+  async onSubmitForm(): Promise<void> {
     if (!this.validAddress) {
       this.flashNotificationService.open('Please enter a valid address!');
       return;
@@ -107,15 +108,12 @@ export class NewAddressModalComponent implements OnInit {
     }
 
     if (this.label !== undefined && this.label.trim() && !this.isMine) {
-      if (this._rpcState.get('locked')) {
-        // unlock wallet and send transaction
-        this._modals.open('unlock', {
-          forceOpen: true, timeout: 3, callback: this.addressCallBack.bind(this)
-        });
-      } else {
-        // wallet already unlocked
+      const isUnlocked = await this._modals.unlock(AuthScopes.ADDRESS_BOOK_CREATE);
+
+      if (isUnlocked) {
         this.addressCallBack();
       }
+
       this.dialogRef.close();
     }
   }

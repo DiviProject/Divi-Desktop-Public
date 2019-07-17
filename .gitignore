@@ -50,3 +50,5 @@ Thumbs.db
 
 # packages
 /packages
+
+**/node_modules/

@@ -16,6 +16,7 @@ import { PassphraseService } from './passphrase/passphrase.service';
 import { RpcStateService, DaemonService } from '../../core';
 import { SnackbarService } from '../../core/snackbar/snackbar.service';
 import { ModalsComponent } from '../modals.component';
+import { AuthScopes } from 'app/core/models/auth-scopes.enum';
 
 @Component({
   selector: 'modal-createwallet',
@@ -214,26 +215,22 @@ export class CreateWalletComponent implements OnDestroy {
     this.dialogRef.componentInstance.enableClose = true;
   }
 
-  public importMnemonicSeed(): void {
+  public async importMnemonicSeed(): Promise<void> {
     this.startProgress();
     this.flashNotification.open('Restarting daemon... Please be patient while your configuration is being reloaded.');
 
-    this._passphraseService.importMnemonic(this.words)
-      .subscribe(
-        success => {
-          this._passphraseService.generateDefaultAddresses();
-          this.step = 7;
-          this.inProgress = false;
-          this.endProgress();
-        },
-        error => {
-          this.step = 4;
-          this.log.er(error);
-          this.errorString = error.message;
-          this.log.er('Mnemonic import failed');
-          this.inProgress = false;
-          this.endProgress();
-        });
+    try {
+      await this._passphraseService.importMnemonic(this.words);
+      this.step = 7;
+    } catch(e) {
+      this.step = 4;
+      this.log.er(e);
+      this.errorString = e.message;
+      this.log.er('Mnemonic import failed');
+    }
+
+    this.inProgress = false;
+    this.endProgress();
   }
 
   validate(): boolean {
@@ -303,16 +300,12 @@ export class CreateWalletComponent implements OnDestroy {
     this.words = words.split(',');
   }
 
-  unlockWallet() {
-    this._modalsService.open('unlock', {forceOpen: true, showStakeOnly: true});
+  async unlockWallet(): Promise<void> {
+    await this._modalsService.unlock(AuthScopes.UNLOCK_WALLET, null, true);
   }
 
   close(): void {
     this.dialogRef.close();
-
-    if (this.isRestore) {
-      this._modalsService.open('syncing', { forceOpen: true });
-    }
   }
 
   public countWords (count: number): boolean {

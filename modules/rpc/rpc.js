@@ -10,6 +10,7 @@ const _util       = require('../util/util');
 const daemon      = require('../daemon/daemon');
 const userSettings= require('../user/settings');
 const {autoUpdater} = require("electron-updater");
+const PrimerManager = require('../primer/primer').Manager;
 
 
 /* spyOnRpc will output all RPC calls being made */
@@ -148,123 +149,97 @@ exports.setTimeoutDelay = function(timeout) { TIMEOUT = timeout }
 */
 
 function initIpcListener() {
+  const primerManager = new PrimerManager(TESTNET);
 
   // Make sure that rpc-channel has no active listeners.
   // Better safe than sorry.
   destroyIpcListener();
 
   // Register new listener
+  log.info('registration')
   rxIpc.registerListener('rpc-channel', (method, params) => {
     const args = params || [];
 
     return Observable.create(observer => {
-      if (['restart-daemon'].includes(method)) {
-        daemon.restart(args).then(() => observer.next(true));
-      } else if (['stop-daemon'].includes(method)) {
-        daemon.stop(args[0], args[1]).then(() => {
-          observer.next();
-          observer.complete();
-        });
-      } else if (['restart-app'].includes(method)) {
-        app.relaunch();
-        app.exit();
-      } else if (['clear-cache'].includes(method)) {
-        _util.removeFolders(TESTNET, ['blocks', 'chainstate', 'sporks', 'zerocoin'], (error, response) => {
-          if (error) {
-            log.error(error);
-            observer.error(error);
-          } else {
-            observer.next(response || undefined);
-            observer.complete();
-          }
-        });
-      } else if (['update-setting'].includes(method)) {
-        const setting = params[0];
-        const value = params[1];
-        userSettings.set(setting, value).then(() => {
-          observer.next();
-          observer.complete();
-        });
-      } else if (['append-file'].includes(method)) {
-        const file = params[0];
-        const line = params[1];
-        _util.appendFile(file, line, TESTNET, (error, response) => {
-          if (error) {
-            log.error(error);
-            observer.error(error);
-          } else {
-            observer.next(response || undefined);
-            observer.complete();
-          }
-        });
-      } else if (['cleanup-for-resore'].includes(method)) {
-        const walletName = `wallet_${new Date().getTime()}.dat`;
-        _util.renameWalletDatFile(TESTNET, walletName, (err) => {
-          if (err) return observer.error(err);
-          observer.next();
-          observer.complete();
-        });
-      } else if (['remove-blocks'].includes(method)) {
-        _util.removeFolder(TESTNET, 'blocks', (error, response) => {
-          if (error) {
-            log.error(error);
-            observer.error(error);
-          } else {
-            observer.next(response || undefined);
-            observer.complete();
-          }
-        });
-      } else if (['remove-chainstate'].includes(method)) {
-        _util.removeFolder(TESTNET, 'chainstate', (error, response) => {
-          if (error) {
-            log.error(error);
-            observer.error(error);
-          } else {
-            observer.next(response || undefined);
-            observer.complete();
-          }
-        });
-      } else if (['remove-daemon'].includes(method)) {
-        _util.removeDaemon();
-        observer.next();
+      const onSuccess = (result) => {
+        observer.next(result || undefined);
         observer.complete();
-      } else if (['settings'].includes(method)) {
-        const _method = params[0];
-        const setting = params[1];
-        const value = params[2];
-        userSettings.handle(_method, setting, value).then((response) => {
-          observer.next(response || undefined);
-          observer.complete();
-        }).then(error => {
-            log.error(error);
-            observer.error(error);
-        });
-      } else if (['check-update'].includes(method)) {
-        autoUpdater.checkForUpdates();
-      } else if (['external-link'].includes(method)) {
-        shell.openExternal(params[0]);
-      } else if (['download-update'].includes(method)) {
-        autoUpdater.downloadUpdate();  
-      } else if (['install-update'].includes(method)) {
-        autoUpdater.quitAndInstall();  
-      } else {
-        exports.call(method, params, (error, response) => {
-          try {
-            if(error) {
-              log.error(error);
-              observer.error(error);
-            } else {
-              observer.next(response || undefined);
-              observer.complete();
-            }
-          } catch (err) {
-            if (err.message == 'Object has been destroyed') {
-              // suppress error
-            } else {
-              log.error(err);
-            }
+      };
+
+      const onError = (err) => {
+        log.error(err);
+        observer.error(err);
+      }
+
+      const handle = (err, result) => {
+        try {
+          if (!err) {
+            return onSuccess(result);
           }
-        });
+  
+          onError(err);
+        } catch (internalErr) {
+          if (internalErr.message == 'Object has been destroyed') {
+            // suppress error
+          } else {
+            log.error(internalErr);
+          }
+        }
+      }
+
+      switch (method) {
+        case 'restart-daemon':
+          return daemon.restart(args).then(onSuccess, onError);
+        case 'stop-daemon':
+          return daemon.stop(args[0], args[1]).then(onSuccess, onError);
+        case 'restart-app':
+          app.relaunch();
+          app.exit();
+          return onSuccess();
+        // primer
+        case 'prepare-primer-backup':
+          primerManager.prepare();
+          return onSuccess();
+        case 'apply-primer-backup':
+          primerManager.apply();
+          return onSuccess();
+        case 'abandon-primer':
+          primerManager.abandon();
+          return onSuccess();
+        // primer
+        case 'clear-cache':
+          return _util.removeFolders(TESTNET, ['blocks', 'chainstate', 'sporks', 'zerocoin'], handle);
+        case 'update-setting':
+          return userSettings.set(params[0], params[1]).then(onSuccess, onError);
+        case 'append-file':
+          return _util.appendFile(params[0], params[1], TESTNET, handle);
+        case 'cleanup-for-resore':
+          return _util.renameWalletDatFile(TESTNET, `wallet_${new Date().getTime()}.dat`, handle);
+        case 'remove-blocks':
+          return _util.removeFolder(TESTNET, 'blocks', handle);
+        case 'remove-chainstate':
+          return _util.removeFolder(TESTNET, 'chainstate', handle);
+        case 'remove-daemon':
+          _util.removeDaemon();
+          return onSuccess();
+        case 'settings':
+          return userSettings.handle(params[0], params[1], params[2]).then(onSuccess, onError);
+        case 'external-link':
+          shell.openExternal(params[0]);
+          return onSuccess();
+        // auto-updater
+        case 'check-update':
+          autoUpdater.checkForUpdates();
+          return onSuccess();
+        case 'download-update':
+          autoUpdater.downloadUpdate();
+          return onSuccess();
+        case 'install-update':
+          autoUpdater.quitAndInstall();  
+          return onSuccess();
+        // rpc call's
+        default: 
+          return exports.call(method, params, handle);
       }
     });
   });

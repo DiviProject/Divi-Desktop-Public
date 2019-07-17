@@ -32,9 +32,8 @@ rpcport=51475
 rpcallowip=127.0.0.1
 rpcconnect=127.0.0.1
 
-addnode=178.128.249.200
-addnode=178.128.241.240
-addnode=178.128.245.145
+addnode=104.248.86.122
+addnode=104.248.86.121
 
 daemon=1
 testnet=1

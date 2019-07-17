@@ -4,6 +4,7 @@ const log           = require('electron-log');
 const ipc           = require('./ipc/ipc');
 const rpc           = require('./rpc/rpc');
 const zmq           = require('./zmq/zmq');
+const primer        = require('./primer/primer');
 
 const daemon        = require('./daemon/daemon');
 const daemonManager = require('./daemon/daemonManager');
@@ -21,6 +22,7 @@ exports.start = function (mainWindow) {
   /* Initialize ZMQ */
   zmq.init(mainWindow);
   // zmq.test(); // loop, will send tests
+  primer.init(mainWindow);
 
   exports.startDaemonManager();
 }

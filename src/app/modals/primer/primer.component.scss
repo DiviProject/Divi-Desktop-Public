@@ -1,0 +1,35 @@
+@import "./src/assets/_config"; // import shared colors etc.
+
+@import "../shared/_modal-layout"; // shared layout for modals (dialog titles etc.)
+
+.section {
+  .history-logs {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    max-width: 380px;
+    margin: 0 auto 20px auto;
+  }
+
+  .ok-icon {
+    color: green;
+  }
+
+  .step-spinner {
+    height: 12px;
+  }
+
+  .title, .description, .actions, .error-container {
+    text-align: center;
+  }
+
+  .title {
+    margin-bottom: 10px;
+  }
+
+  .description {
+    font-size: 14px;
+    max-width: 430px;
+    margin: 0 auto 20px auto;
+  }
+}

@@ -234,3 +234,9 @@ input:checked + .slider:before {
 .material-checkbox > input:checked + span::after {
   border-color: #fff;
 }
+
+input {
+  &.verify-sucess {
+    color: #000000 !important;
+  }
+}

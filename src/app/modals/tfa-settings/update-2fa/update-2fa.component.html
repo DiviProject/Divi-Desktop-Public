@@ -1,0 +1,29 @@
+<div class="update-2fa">
+  <div class="error-message" *ngIf="!!error">
+    <p>{{error}}</p>
+  </div>
+
+  <ng-container *ngIf="!!settings">
+    <div class="scopes">
+      <h3>Require 2FA passcode for</h3>
+      <app-tfa-scopes [scopes]="settings.twoFactorAuthScopesTemp" (onChange)="onScopesChange($event)"></app-tfa-scopes>
+    </div>
+
+    <div class="actions">
+      <button class="validate mat-raised-button mat-primary" color="primary" mat-button color="primary"
+        [disabled]="settings.twoFactorAuthScopes === settings.twoFactorAuthScopesTemp || !settings.twoFactorAuthScopesTemp" (click)="onSaveClick()">
+        Save
+      </button>
+
+      <button class="validate mat-raised-button mat-primary" color="primary" mat-button color="primary"
+        (click)="onDisableClick()">
+        Disable
+      </button>
+
+      <button class="validate mat-raised-button mat-primary" color="primary" mat-button color="primary"
+        (click)="onCloseClick()">
+        Close
+      </button>
+    </div>
+  </ng-container>
+</div>

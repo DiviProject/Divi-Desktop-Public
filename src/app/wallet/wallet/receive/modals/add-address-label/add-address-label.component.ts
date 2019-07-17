@@ -1,10 +1,11 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialog, MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material';
 import { Log } from 'ng2-logger';
 
-import { RpcService, RpcStateService, SnackbarService, DiviService } from '../../../../../core';
+import { RpcService, SnackbarService, DiviService } from '../../../../../core';
 import { ModalsService } from '../../../../../modals/modals.service';
+import { AuthScopes } from 'app/core/models/auth-scopes.enum';
 
 @Component({
   selector: 'app-add-address-label',
@@ -25,9 +26,7 @@ export class AddAddressLabelComponent implements OnInit {
     public dialogRef: MatDialogRef<AddAddressLabelComponent>,
     private formBuilder: FormBuilder,
     private rpc: RpcService,
-    private rpcState: RpcStateService,
     private flashNotificationService: SnackbarService,
-    private dialog: MatDialog,
     private divi: DiviService,
     private _modals: ModalsService) {
   }
@@ -42,12 +41,10 @@ export class AddAddressLabelComponent implements OnInit {
     });
   }
 
-  onSubmitForm(): void {
-    if (this.rpcState.get('locked')) {
-      // unlock wallet
-      this._modals.open('unlock', {forceOpen: true, timeout: 3, callback: this.addNewLabel.bind(this)});
-    } else {
-      // wallet already unlocked
+  async onSubmitForm(): Promise<void> {
+    const isUnlocked = await this._modals.unlock(AuthScopes.ADDRESS_ADD_LABEL);
+
+    if (isUnlocked) {
       this.addNewLabel();
     }
   }

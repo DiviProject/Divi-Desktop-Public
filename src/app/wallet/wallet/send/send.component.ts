@@ -21,6 +21,7 @@ import * as rp from 'request-promise';
 import * as _ from 'lodash';
 import { BalanceService, DiviService, BlockStatusService } from '../../../core';
 import { FullBalanceInfo } from '../../../core/models/full-balance-info';
+import { AuthScopes } from 'app/core/models/auth-scopes.enum';
 
 @Component({
   selector: 'app-send',
@@ -218,12 +219,10 @@ export class SendComponent implements OnInit {
     this.send.validAddress = undefined;
   }
 
-  onSubmit(): void {
-    if (this._rpcState.get('locked')) {
-      // unlock wallet and send transaction
-      this._modals.open('unlock', {forceOpen: true, timeout: 30, callback: this.openSendConfirmationModal.bind(this)});
-    } else {
-      // wallet already unlocked
+  async onSubmit(): Promise<void> {
+    const isUnlocked = await this._modals.unlock(AuthScopes.SEND);
+
+    if (isUnlocked) {
       this.openSendConfirmationModal();
     }
   }
@@ -240,15 +239,15 @@ export class SendComponent implements OnInit {
     dialogRef.componentInstance.dialogContent = txt;
     dialogRef.componentInstance.send = this.send;
 
-    dialogRef.componentInstance.onConfirm.subscribe(() => {
+    dialogRef.componentInstance.onConfirm.subscribe(async () => {
       dialogRef.close();
       this.send.prepare(this.prices);
-      this.pay();
+      await this.pay();
     });
   }
 
   /** Payment function */
-  pay(): void {
+  async pay(): Promise<void> {
     if (!this.send.input) {
       this.flashNotification.open('You need to select an input type (public, blind or anon)!');
       return;
@@ -283,11 +282,9 @@ export class SendComponent implements OnInit {
 
     }
 
-    if (this._rpcState.get('locked')) {
-      // unlock wallet and send transaction
-      this._modals.open('unlock', {forceOpen: true, timeout: 30, callback: this.sendTransaction.bind(this)});
-    } else {
-      // wallet already unlocked
+    const isUnlocked = await this._modals.unlock(AuthScopes.SEND_CONFIRMATION);
+
+    if (isUnlocked) {
       this.sendTransaction();
     }
   }
@@ -299,7 +296,6 @@ export class SendComponent implements OnInit {
 
       this.sendService.sendTransaction(this.send);
     } else {
-
       this.sendService.transferBalance(this.send);
     }
     this.setFormDefaultValue();

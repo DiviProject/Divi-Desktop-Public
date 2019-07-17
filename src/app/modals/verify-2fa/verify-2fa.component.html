@@ -1,0 +1,21 @@
+<div class="container">
+  <div class="content">
+    <div class="section">
+      <div class="title">Enter 2FA Passcode</div>
+        <div class="error-message" *ngIf="!!error">
+          <p>{{error}}</p>
+        </div>
+
+        <mat-form-field>
+          <input matInput name="token" id="token" type="text" [(ngModel)]="token" (ngModelChange)="onTokenChange($event)" placeholder="Passcode" />
+        </mat-form-field>
+        <div class="actions">
+          <button mat-raised-button 
+            color="primary" 
+            (click)="close()">
+            Close
+          </button>
+        </div>
+    </div>
+  </div>
+</div>

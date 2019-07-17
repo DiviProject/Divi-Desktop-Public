@@ -17,3 +17,5 @@ export { InvocationService } from './services/invocation.service';
 export { ExportService } from './services/export.service';
 export { SecutiyService } from './services/security.service';
 export { AppSettingsService } from './services/app-settings.service';
+export { PrimerService } from './services/primer.service';
+export { SettingsService } from './services/settings.service';

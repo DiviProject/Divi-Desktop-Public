@@ -53,6 +53,7 @@ class SafeIpcRenderer {
 window.ipc = new SafeIpcRenderer([
   'app-event',
   'auto-updater',
+  'primer',
   'front-choosewallet',
   'zmq',
   'front-walletready',

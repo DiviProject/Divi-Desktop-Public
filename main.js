@@ -8,8 +8,8 @@ const url           = require('url');
 const platform      = require('os').platform();
 const rxIpc         = require('rx-ipc-electron/lib/main').default;
 const Observable    = require('rxjs/Observable').Observable;
-const packageJson       = require('./package.json');
-const util       = require('./modules/util/util');
+const packageJson   = require('./package.json');
+const util          = require('./modules/util/util');
 const {autoUpdater} = require("electron-updater");
 
 /* correct appName and userData to respect Linux standards */
@@ -28,6 +28,8 @@ let client = "";
 ].map(path => !fs.existsSync(path) && fs.mkdir(path));
 
 const log     = require('./modules/logger').init();
+
+process.on('uncaughtException', (err) => { log.error(err); });
 
 autoUpdater.logger = log;
 autoUpdater.autoDownload = false;

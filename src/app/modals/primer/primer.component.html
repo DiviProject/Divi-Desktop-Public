@@ -1,0 +1,48 @@
+<div class="container disable-select">
+  <div class="content">
+    <div class="section">
+      <div class="title">Primer</div>
+      <div class="description" *ngIf="!isErrorOccurred">The blockchain "Primer" serves as a method for out-of-sync wallets to quickly regain sync status.</div>
+
+      <ul class="history-logs" *ngIf="!isErrorOccurred">
+        <li *ngFor="let log of primerService.historyLogs; let i = index; let last = last">
+          {{(i + 1)}}. {{log}}
+          <mat-icon class="ok-icon" fontSet="partIcon" fontIcon="part-check" *ngIf="!last || dialogRef.componentInstance.enableClose"></mat-icon>
+          <img class="step-spinner" src="assets/img/masternode/spinner.gif" *ngIf="last && !dialogRef.componentInstance.enableClose" />
+        </li>
+      </ul>
+
+      <div class="error-container" *ngIf="isErrorOccurred">
+        <h2>An error occurred</h2>
+        <h3>Looks like something is not quite right</h3>
+      </div>
+
+      <div class="actions">
+        <button mat-raised-button 
+                color="primary" 
+                (click)="restore()"
+                *ngIf="dialogRef.componentInstance.enableClose && isRestoreVisible && !isErrorOccurred">
+          Restore
+        </button>
+        <button mat-raised-button 
+                color="primary" 
+                (click)="retry()"
+                *ngIf="dialogRef.componentInstance.enableClose && isErrorOccurred">
+          Retry
+        </button>
+        <button mat-raised-button 
+                color="primary" 
+                (click)="close()"
+                *ngIf="dialogRef.componentInstance.enableClose">
+          Close
+        </button>
+        <button mat-raised-button 
+                color="primary" 
+                (click)="abandon()"
+                *ngIf="enableAbandon">
+          Abandon
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

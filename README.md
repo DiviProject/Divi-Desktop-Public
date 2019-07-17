@@ -40,8 +40,4 @@ You can directly interact with the daemon ran by the Electron version.
 * `yarn run package:mac` – OSX
 * `yarn run package:linux` – Linux
 
-## Credits & License
-
-This application was originally forked from [Particl Desktop](https://github.com/particl/particl-desktop) and is used under the [GNU General Public License](https://github.com/Divicoin/Divi-Desktop-Public/blob/master/LICENSE) 
-
 

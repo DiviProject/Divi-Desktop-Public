@@ -1,0 +1,56 @@
+<div class="setup-2fa">
+  <div class="error-message" *ngIf="!!error">
+    <p>{{error}}</p>
+  </div>
+
+  <ng-container *ngIf="!!info">
+    <ng-container *ngIf="steps.Scan === currentStep">
+      <p>Open your favorite 2FA app and scan the QR code below - or enter the key manually.</p>
+
+      <h3>Scan QR Code:</h3>
+      <img [src]="info.dataURL" />
+
+      <div class="text-left">
+        <h3>Enter manually:</h3>
+        <p class="secret">{{info.secret}}</p>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="steps.Confirm === currentStep">
+      <p>Make sure you have backed up your manual code as you will not be able to access it after this process has been completed.</p>
+
+      <h3>Have you scanned/entered the code?</h3>
+    </ng-container>
+
+    <ng-container *ngIf="steps.Scopes === currentStep">
+      <h3>Require 2FA passcode for</h3>
+      <app-tfa-scopes [scopes]="scopes" (onChange)="onScopesChange($event)"></app-tfa-scopes>
+    </ng-container>
+
+    <ng-container *ngIf="steps.Verify === currentStep">
+      <p>Enter the token from your Authenticator app.</p>
+
+      <mat-form-field>
+        <input matInput name="token" id="token" type="text" [(ngModel)]="token" placeholder="Passcode" />
+      </mat-form-field>
+    </ng-container>
+  </ng-container>
+
+  <div class="actions">
+    <button mat-raised-button class="back-button" (click)="onBackClick()" *ngIf="steps.Verify === currentStep || steps.Scopes === currentStep">
+      <span>Back</span>
+    </button>
+
+    <button [disabled]="!scopes && steps.Scopes === currentStep" mat-raised-button color="primary" (click)="onNextClick()">
+      <span *ngIf="steps.Scan === currentStep">Continue</span>
+      <span *ngIf="steps.Scopes === currentStep">Continue</span>
+      <span *ngIf="steps.Confirm === currentStep">Yes</span>
+      <span *ngIf="steps.Verify === currentStep">Finish</span>
+    </button>
+
+    <button mat-raised-button color="primary" (click)="onBackClick()" *ngIf="steps.Verify !== currentStep">
+      <span *ngIf="steps.Confirm === currentStep">No</span>
+      <span *ngIf="steps.Scan === currentStep">Cancel</span>
+    </button>
+  </div>
+</div>

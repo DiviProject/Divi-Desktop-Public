@@ -1,8 +1,9 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Observable, Observer, Subscription } from 'rxjs'; // use this for testing atm
+import { Observable, Observer } from 'rxjs'; // use this for testing atm
 import { Log } from 'ng2-logger';
 
 import { RpcService } from '../rpc.service';
+import { RpcStateService } from '../rpc-state/rpc-state.service';
 
 @Injectable()
 export class PeerService implements OnDestroy {
@@ -21,7 +22,8 @@ export class PeerService implements OnDestroy {
   private _highestBlockHeightNetwork: Observable<number>;
   private _observerHighestBlockHeightNetwork: Observer<number>;
 
-  constructor(private _rpc: RpcService) {
+  constructor(private _rpc: RpcService, private rpcState: RpcStateService) {
+    this.rpcState.observe('settings').subscribe(() => this._observerHighestBlockHeightNetwork.next(-1))
 
     this._peerList = Observable.create(
       observer => this._observerPeerList = observer
@@ -63,31 +65,10 @@ export class PeerService implements OnDestroy {
     }
   }
 
-  private setPeerList(peerList: Array<Object>) {
-
-    // update network block height changes
-    this._observerHighestBlockHeightNetwork.next(this.calculateBlockCountNetwork(peerList));
-
-    this._observerPeerList.next(peerList);
-  }
-
-  private calculateBlockCountNetwork(peerList: Array<Object>): number {
-    let highestBlockHeightNetwork = -1;
-
-    peerList.forEach(peer => {
-      // th3brink: divi getpeerinfo doesn't have a currentheight property so used synced_blocks.
-      const networkHeightByPeer = (<any>peer).synced_blocks;
-
-      if (highestBlockHeightNetwork < networkHeightByPeer || highestBlockHeightNetwork === -1) {
-        highestBlockHeightNetwork = networkHeightByPeer;
-      }
-    });
-
-    return highestBlockHeightNetwork;
-  }
-
   private setPeerListForStartingHeight(peerList: Array<Object>) {
-    this._observerHighestBlockHeightNetwork.next(this.calculateStartingHeightNetwork(peerList));
+    if (!!peerList && !!peerList.length) {
+      this._observerHighestBlockHeightNetwork.next(this.calculateStartingHeightNetwork(peerList));
+    }
 
     this._observerPeerList.next(peerList);
   }

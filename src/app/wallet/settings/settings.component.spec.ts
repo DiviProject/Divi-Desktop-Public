@@ -4,8 +4,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 
 import { SharedModule } from '../shared/shared.module';
 
-import { SettingsService } from './settings.service';
-
 import { SettingsComponent } from './settings.component';
 
 describe('SettingsComponent', () => {
@@ -16,7 +14,7 @@ describe('SettingsComponent', () => {
     TestBed.configureTestingModule({
       imports: [ RouterTestingModule, SharedModule ],
       declarations: [ SettingsComponent ],
-      providers: [ SettingsService, Location ]
+      providers: [ Location ]
     })
     .compileComponents();
   }));

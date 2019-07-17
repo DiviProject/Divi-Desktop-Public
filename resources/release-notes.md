@@ -1,12 +1,18 @@
-Changelog for Divi Desktop Wallet
+# Changelog
 
-1.0.1
-BUGS
-  - Fixed bug with balances.
-  - Fixed bug with amount in transactions.
+## 🚀 Features
+* Two-Factor Authentication
 
-IMPROVEMENTS
-  - RPC calls was reduced.
+*Secure the following wallet features with 2FA* 
+&nbsp;* Send
+&nbsp;* Backup
+&nbsp;* Unlock wallet
+&nbsp;* Console access
+* Blockchain "Primer"
+*The blockchain "Primer" serves as a method for out-of-sync wallets to quickly regain sync status.*
+* MOCCI email notifications
 
-FEATURES
-  - Added support for Testnet.
+## 🐛 Bugfixes
+* MOCCI stability improvements
+* Minor UI updates
+* Minor security updates

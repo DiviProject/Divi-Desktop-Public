@@ -41,4 +41,24 @@ export class InvocationService {
     public timeout(func: Function, delay: number): any {
         return setTimeout(func, delay);
     }
+
+    public delay(delay: number): Promise<void> {
+        return new Promise((resolve, reject) => {
+            setTimeout(resolve, delay);
+        });
+    }
+
+    public limited(action: Function, time: number): Promise<void> {
+        return new Promise(async (resolve, reject) => {
+            const timeout = setTimeout(reject, time);
+            try {
+                const result = await action();
+                resolve(result);
+            } catch (e) {
+                reject(e);
+            }
+
+            clearTimeout(timeout);
+        });
+    }
 }

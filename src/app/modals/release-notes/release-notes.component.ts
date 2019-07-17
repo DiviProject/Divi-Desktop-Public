@@ -23,8 +23,8 @@ export class ReleaseNotesComponent implements OnInit {
 
   private prepareReleaseNotes(): void {
     this.releaseInfo.releaseNotes = this.replace(this.releaseInfo.releaseNotes, '\r\n', '<br />');
-    const boldText = ['Bug Fixes', 'Features', 'Changelog'];
-    boldText.forEach(t => this.releaseInfo.releaseNotes = this.replace(this.releaseInfo.releaseNotes, t, `<b>${t}</b>`));
+    // const boldText = ['Bug Fixes', 'Features', 'Changelog'];
+    // boldText.forEach(t => this.releaseInfo.releaseNotes = this.replace(this.releaseInfo.releaseNotes, t, `<b>${t}</b>`));
   }
 
   private replace(str: string, oldValue: string, newValue: string): string {

@@ -114,16 +114,16 @@ export class BlockStatusService {
     const internalBH = this.highestBlockHeightInternal;
     const networkBH = this.highestBlockHeightNetwork;
 
-    if (internalBH < 0 || networkBH < 0) {
+    if (newHeight < 0 || networkBH < 0) {
       this.status.syncPercentage = 0;
       return;
     }
 
     // remainingBlocks
-    this.status.remainingBlocks = networkBH - internalBH;
+    this.status.remainingBlocks = networkBH - newHeight;
 
     // syncPercentage
-    this.status.syncPercentage = internalBH / networkBH * 100;
+    this.status.syncPercentage = newHeight / networkBH * 100;
     if (this.status.syncPercentage > 100) {
       this.status.syncPercentage = 100;
     }

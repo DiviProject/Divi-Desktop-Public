@@ -15,14 +15,13 @@ export class DaemonService implements OnDestroy {
   });
 
   constructor(private rpc: RpcService, private rpcState: RpcStateService, private peerService: PeerService) {
-    this.init();
   }
 
   public ngOnDestroy(): void {
     this.destroyed = true;
   }
 
-  private init(): void {
+  public init(): void {
     this.rpcState.observe(RpcStateService.WALLET_INITIALIZED_KEY)
       .takeWhile(_ => !this.destroyed)
       .subscribe(inited => inited ? this.peerService.update() : null);

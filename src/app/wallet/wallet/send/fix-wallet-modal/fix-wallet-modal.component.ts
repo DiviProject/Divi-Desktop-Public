@@ -4,6 +4,7 @@ import { MatDialogRef, MatDialog } from '@angular/material';
 import { RpcService, RpcStateService } from 'app/core';
 import { ModalsService } from 'app/modals/modals.module';
 import { WalletFixedConfirmationComponent } from './wallet-fixed-confirmation/wallet-fixed-confirmation.component';
+import { AuthScopes } from 'app/core/models/auth-scopes.enum';
 
 @Component({
   selector: 'app-fix-wallet-modal',
@@ -14,7 +15,6 @@ export class FixWalletModalComponent implements OnInit {
 
   constructor(
     private _rpc: RpcService,
-    private _rpcState: RpcStateService,
     private _modals: ModalsService,
     private dialogRef: MatDialogRef<FixWalletModalComponent>,
     private dialog: MatDialog
@@ -23,14 +23,14 @@ export class FixWalletModalComponent implements OnInit {
   ngOnInit() {
   }
 
-  fix(): void {
-    if (this._rpcState.get('locked')) {
-      // unlock wallet and send transaction
-      this._modals.open('unlock', {forceOpen: true, timeout: 3, callback: this.scanChain.bind(this)});
-    } else {
-      // wallet already unlocked
-      this.scanChain();
+  async fix(): Promise<void> {
+    const isUnlocked = await this._modals.unlock(AuthScopes.FIX_WALLET);
+
+    if (!isUnlocked) {
+      return;
     }
+
+    this.scanChain();
   }
 
   scanChain() {

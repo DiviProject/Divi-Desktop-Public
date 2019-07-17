@@ -1,0 +1,8 @@
+<div class="tfa-scopes-container">
+  <div class="scope-group">
+    <h4>General</h4>
+    <label class="scope" *ngFor="let scope of getGroup('general')">
+      <input type="checkbox" (change)="onScopeChange()" [(ngModel)]="model[scope.value]"> {{scope.name}} 
+    </label>
+  </div>
+</div>

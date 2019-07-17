@@ -71,88 +71,201 @@
           </div>
 
           <div fxFlex="1 1 120px">
-              <h4 matTooltip="Refresh folders that may be holding unneccessary or corrupted data. Can help with syncing issues">Clear Cache</h4>
-  
-              <button class="validate mat-raised-button mat-primary"
-                      color="primary"
-                      mat-button color="primary"
-                      (click)="clearCache()">
-                Clear Cache
-              </button>
-            </div>
+            <h4 matTooltip="Refresh folders that may be holding unneccessary or corrupted data. Can help with syncing issues">Clear Cache</h4>
+
+            <button class="validate mat-raised-button mat-primary"
+                    color="primary"
+                    mat-button color="primary"
+                    (click)="clearCache()">
+              Clear Cache
+            </button>
+          </div>
+        </div>
+      </mat-card>
+      <!-- primer -->
+      <mat-card class="pay-to" style="margin: 10px; margin-left: 30px; margin-right: 30px;">
+        <div>
+          <h2>
+            Blockchain "Primer"
+          </h2>
+          <h4>
+            The blockchain "Primer" serves as a method for out-of-sync wallets to quickly regain sync status.
+          </h4>
+        </div>
+
+        <div class="cards" style="margin-bottom: 20px">
+          <div class="card row">
+            <input type="checkbox" (change)="onSettingsChange()" [(ngModel)]="settings.main.primer"> Automatic primer restore
+          </div>
+        </div>
+
+        <div fxLayout="row" fxLayoutGap="20px">
+          <button class="validate mat-raised-button mat-primary"
+                  color="primary"
+                  mat-button
+                  color="primary"
+                  (click)="onPrimerRestoreClick()">
+            Manual Restore
+          </button>
         </div>
       </mat-card>
     </mat-tab>
     <mat-tab label="Security">
       <mat-card *ngIf="!walletInited" class="pay-to" style="margin: 10px; margin-left: 30px; margin-right: 30px;">
-          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       </mat-card>
-      <mat-card *ngIf="walletInited" class="pay-to" style="margin: 10px; margin-left: 30px; margin-right: 30px;">
-        <div fxLayout="row" fxLayoutGap="20px" style="margin-bottom: 10px;">
-          <div fxFlex="1 1 110px" *ngIf="encryptionStatus === 'Unencrypted'">
-            <h4>Encrypt Wallet</h4>
-            <button class="validate mat-raised-button mat-primary" color="primary" mat-button color="primary" (click)="encryptwallet()">Encrypt</button>
-          </div>
-
-          <div fxFlex="1 1 110px"
-                *ngIf="encryptionStatus === 'Unlocked' || encryptionStatus === 'Locked' || encryptionStatus === 'Unlocked, staking only'">
-            <h4 matTooltip="Lock or unlock your wallet using a password.">Wallet lock/unlock</h4>
-
-            <div *ngIf="encryptionStatus === 'Unlocked'">
+      <ng-container *ngIf="walletInited" >
+        <mat-card class="pay-to" style="margin: 10px; margin-left: 30px; margin-right: 30px;">
+          <div fxLayout="row" fxLayoutGap="20px" style="margin-bottom: 10px;">
+            <div fxFlex="1 1 110px" *ngIf="encryptionStatus === 'Unencrypted'">
+              <h4>Encrypt Wallet</h4>
+              <button class="validate mat-raised-button mat-primary" color="primary" mat-button color="primary" (click)="encryptwallet()">Encrypt</button>
+            </div>
+  
+            <div fxFlex="1 1 110px"
+                 *ngIf="encryptionStatus === 'Unlocked' || encryptionStatus === 'Locked' || encryptionStatus === 'Unlocked, staking only'">
+              <h4 matTooltip="Lock or unlock your wallet using a password.">Wallet lock/unlock</h4>
+  
+              <div *ngIf="encryptionStatus === 'Unlocked'">
+                <button class="validate mat-raised-button mat-primary"
+                        color="primary"
+                        mat-button color="primary"
+                        (click)="lockwallet()">
+                  Lock Wallet
+                </button>
+              </div>
+              <div *ngIf="encryptionStatus === 'Locked' || encryptionStatus === 'Unlocked, staking only'">
+                <button class="validate mat-raised-button mat-primary"
+                        color="primary"
+                        mat-button color="primary"
+                        (click)="unlockwallet()">
+                  Unlock Wallet
+                </button>
+              </div>
+            </div>
+  
+            <div fxFlex="1 1 110px">
+              <h4 matTooltip="Recover an older wallet using a mnemonic seed phrase.">Recover from seed</h4>
+  
               <button class="validate mat-raised-button mat-primary"
                       color="primary"
                       mat-button color="primary"
-                      (click)="lockwallet()">
-                Lock Wallet
+                      (click)="recover()">
+                Recover
               </button>
             </div>
-            <div *ngIf="encryptionStatus === 'Locked' || encryptionStatus === 'Unlocked, staking only'">
+  
+            <div fxFlex="1 1 110px">
+              <h4 matTooltip="Backup your current wallet with a mnemonic seed phrase.">Backup from seed</h4>
+  
               <button class="validate mat-raised-button mat-primary"
                       color="primary"
                       mat-button color="primary"
-                      (click)="unlockwallet()">
-                Unlock Wallet
+                      (click)="backup()">
+                Backup
               </button>
             </div>
+  
+            <div fxFlex="1 1 160px"
+                 *ngIf="encryptionStatus === 'Unlocked' || encryptionStatus === 'Locked' || encryptionStatus === 'Unlocked, staking only'">
+              <h4 matTooltip="Change the password you use to unlock/lock the wallet.">Change password</h4>
+  
+              <div>
+                <button class="validate mat-raised-button mat-primary"
+                        color="primary"
+                        mat-button color="primary"
+                        (click)="changePassword()">
+                  Change Password
+                </button>
+              </div>
+            </div>
           </div>
-
-          <div fxFlex="1 1 110px">
-            <h4 matTooltip="Recover an older wallet using a mnemonic seed phrase.">Recover from seed</h4>
-
-            <button class="validate mat-raised-button mat-primary"
+        </mat-card>
+        <!-- 2fa -->
+        <mat-card class="pay-to" style="margin: 10px; margin-left: 30px; margin-right: 30px;">
+          <div fxLayout="row" fxLayoutGap="10px">
+            <h2> 2-Factor Authentication</h2>
+          </div>
+          <div fxLayout="row" fxLayoutGap="10px" style="margin-bottom: 30px;">
+            <span>Secure your wallet by adding a second layer of authentication.</span>
+          </div>
+          <div fxLayout="row" fxLayoutGap="20px" style="margin-bottom: 10px;">
+            <button *ngIf="encryptionStatus === 'Locked' || encryptionStatus === 'Unlocked, staking only'"
+              class="validate mat-raised-button mat-primary"
               color="primary"
               mat-button color="primary"
-              (click)="recover()">
-              Recover
+              (click)="unlockwallet(false)">
+              Unlock Wallet
+            </button>
+
+            <button *ngIf="(encryptionStatus === 'Unencrypted' || encryptionStatus === 'Unlocked') && userSettings?.twoFactorAuthEnabled === false"
+              class="validate mat-raised-button mat-primary" 
+              color="primary" 
+              mat-button 
+              color="primary" 
+              (click)="onSetup2faClick()">
+              Setup 2-Factor Authentication
+            </button>
+
+            <button *ngIf="(encryptionStatus === 'Unencrypted' || encryptionStatus === 'Unlocked') && userSettings?.twoFactorAuthEnabled === true"
+              class="validate mat-raised-button mat-primary" 
+              color="primary" 
+              mat-button 
+              color="primary" 
+              (click)="onSetup2faClick()">
+              Update 2-Factor Authentication
             </button>
           </div>
-
-          <div fxFlex="1 1 110px">
-            <h4 matTooltip="Backup your current wallet with a mnemonic seed phrase.">Backup from seed</h4>
-
+        </mat-card>
+      </ng-container>
+    </mat-tab>
+    <mat-tab label="User">
+      <mat-card *ngIf="!walletInited" class="pay-to" style="margin: 10px; margin-left: 30px; margin-right: 30px;">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      </mat-card>
+      <ng-container *ngIf="walletInited">
+        <mat-card class="pay-to" style="margin: 10px; margin-left: 30px; margin-right: 30px;" *ngIf="encryptionStatus === 'Unlocked' || encryptionStatus === 'Unencrypted'">
+          <div *ngIf="userInfo">
+            <h2>User Information</h2>
+            <h4>Add your email address to be notified when your MOCCI node goes down.</h4>
+            <div class="card row">
+              <div style="margin-bottom: 20px;">
+                <mat-form-field fxFlex="1 1 100%" class="full-width larger">
+                  <input name="email" matInput
+                         [ngClass]="{'verify-sucess': checkEmail(), 'verify-error': !checkEmail()}"
+                         type="text" placeholder="e-mail address" [(ngModel)]="userInfo.email" />
+                </mat-form-field>
+              </div>
+              <div style="margin-bottom: 20px;">
+                <mat-form-field fxFlex="1 1 100%" class="full-width larger">
+                  <input name="userName" matInput type="text" placeholder="username" [(ngModel)]="userInfo.userName" />
+                </mat-form-field>
+              </div>
+              <div style="margin-bottom: 20px;">
+                <div class="card row">
+                  <input type="checkbox" [(ngModel)]="userInfo.isSubscribed"> Receive notifications
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="container-fluid" *ngIf="userInfo">
+            <button class="validate mat-raised-button mat-primary" color="primary" mat-button color="primary" [disabled]="!checkEmail()" (click)="updateUserInfo()">Update</button>
+            <p *ngIf="errorMsg">ERROR: {{errorMsg}}</p>
+          </div>
+        </mat-card>
+        <mat-card class="pay-to" style="margin: 10px; margin-left: 30px; margin-right: 30px;" *ngIf="encryptionStatus === 'Locked' || encryptionStatus === 'Unlocked, staking only'">
+          <h2>User Information</h2>
+          <h4>User information is unavaliable when wallet is locked. Please unlock your wallet.</h4>
+          <div class="container-fluid">
             <button class="validate mat-raised-button mat-primary"
                     color="primary"
                     mat-button color="primary"
-                    (click)="backup()">
-              Backup
+                    (click)="unlockwallet()">
+              Unlock Wallet
             </button>
           </div>
-
-          <div fxFlex="1 1 160px"
-          *ngIf="encryptionStatus === 'Unlocked' || encryptionStatus === 'Locked' || encryptionStatus === 'Unlocked, staking only'">
-            <h4 matTooltip="Change the password you use to unlock/lock the wallet.">Change password</h4>
-
-            <div>
-              <button class="validate mat-raised-button mat-primary"
-                      color="primary"
-                      mat-button color="primary"
-                      (click)="changePassword()">
-                Change Password
-              </button>
-            </div>
-          </div>
-        </div>
-      </mat-card>
+        </mat-card>
+      </ng-container>
     </mat-tab>
     <mat-tab label="Network">
       <mat-card class="pay-to" style="margin: 10px; margin-left: 30px; margin-right: 30px;">
@@ -196,16 +309,16 @@
           </div>
 
           <!-- <div class="card row">
-            <div class="input-label col-xs-4">
-              <h4>Unit to show amounts in</h4>
-            </div>
-            <div style="margin-bottom: 20px;">
-              <mat-select class="underliningSelect" fxFlex="0 0 70px" name="currency" (change)="onSettingsChange()" [(ngModel)]="settings.display.units" placeholder="Divi">
-                <mat-option value="part">DIVI</mat-option>
-                <mat-option value="usd">USD</mat-option>
-              </mat-select>
-            </div>
-          </div> -->
+          <div class="input-label col-xs-4">
+            <h4>Unit to show amounts in</h4>
+          </div>
+          <div style="margin-bottom: 20px;">
+            <mat-select class="underliningSelect" fxFlex="0 0 70px" name="currency" (change)="onSettingsChange()" [(ngModel)]="settings.display.units" placeholder="Divi">
+              <mat-option value="part">DIVI</mat-option>
+              <mat-option value="usd">USD</mat-option>
+            </mat-select>
+          </div>
+        </div> -->
 
           <div class="card row">
             <div class="input-label col-xs-4">

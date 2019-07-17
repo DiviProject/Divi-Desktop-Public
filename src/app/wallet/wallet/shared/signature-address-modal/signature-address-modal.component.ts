@@ -10,6 +10,7 @@ import { ModalsService } from '../../../../modals/modals.service';
 
 import { AddressLookUpCopy } from '../../models/address-look-up-copy';
 import { AddressLookupComponent } from '../../addresslookup/addresslookup.component';
+import { AuthScopes } from 'app/core/models/auth-scopes.enum';
 
 
 
@@ -103,14 +104,14 @@ export class SignatureAddressModalComponent implements OnInit {
   }
   // copy code end
 
-  onFormSubmit(): void {
-    if (this._rpcState.get('locked')) {
-      // unlock wallet
-      this._modals.open('unlock', {forceOpen: true, timeout: 3, callback: this.signVerifyMessage.bind(this)});
-    } else {
-      // wallet already unlocked
-      this.signVerifyMessage();
+  async onFormSubmit(): Promise<void> {
+    const isUnlocked = await this._modals.unlock(AuthScopes.SIGNATURE_VERIFY_MESSAGE);
+
+    if (!isUnlocked) {
+      return;
     }
+      
+    this.signVerifyMessage();
   }
 
   signVerifyMessage(): void {

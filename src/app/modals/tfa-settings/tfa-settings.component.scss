@@ -1,0 +1,15 @@
+@import "./src/assets/_config"; // import shared colors etc.
+
+@import "../shared/_modal-layout"; // shared layout for modals (dialog titles etc.)
+
+.container {
+  .content {
+    &.tfa-settings {
+      max-width: 330px;
+    }
+
+    .title {
+      text-transform: initial;
+    }
+  }
+}

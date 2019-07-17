@@ -12,6 +12,7 @@ import { MAT_DIALOG_DATA } from '@angular/material';
   styleUrls: ['./unlockwallet.component.scss']
 })
 export class UnlockwalletComponent {
+  public description: string = 'Please enter your password to unlock your wallet';
 
   // constants
   log: any = Log.create('unlockwallet.component');
@@ -26,8 +27,10 @@ export class UnlockwalletComponent {
   constructor(
     public dialogRef: MatDialogRef<ModalsComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any  ) {
-    if (data && data.data && data.data.alwaysUnlocked) {
-      this.alwaysUnlocked = data.data.alwaysUnlocked;
+
+    if (data && data.data) {
+      this.description = data.data.description || this.description;
+      this.alwaysUnlocked = !!data.data.alwaysUnlocked;
     }
   }
 

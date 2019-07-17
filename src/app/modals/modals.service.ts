@@ -1,9 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs';
 import { Log } from 'ng2-logger';
 
-import { RpcService, RpcStateService, BlockStatusService, UpdateService, SecutiyService } from '../core';
+import { RpcStateService, UpdateService, SecutiyService, RpcService } from '../core';
 
 /* modals */
 import { CreateWalletComponent } from './createwallet/createwallet.component';
@@ -14,25 +12,27 @@ import { UnlockwalletComponent } from './unlockwallet/unlockwallet.component';
 import { EncryptwalletComponent } from './encryptwallet/encryptwallet.component';
 import { MultiwalletComponent } from './multiwallet/multiwallet.component';
 
-import {MatDialog, MatDialogRef} from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material';
 import { ModalsComponent } from './modals.component';
 import { AutoUpdateComponent } from './auto-update/auto-update.component';
 import { ReleaseNotesComponent } from './release-notes/release-notes.component';
 import { WalletVerifyResultComponent } from './wallet-verify-result/wallet-verify-result.component';
 import { ShutdownComponent } from './shutdown/shutdown.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
+import { Verify2faComponent } from './verify-2fa/verify-2fa.component';
+import { PrimerComponent } from './primer/primer.component';
+import { TfaSettingsComponent } from './tfa-settings/tfa-settings.component';
+import { AuthScopes } from 'app/core/models/auth-scopes.enum';
 
 @Injectable()
 export class ModalsService implements OnDestroy {
 
   public modal: any = null;
-  private progress: Subject<Number> = new Subject<Number>();
 
   public enableClose: boolean = true;
   private isOpen: boolean = false;
   private manuallyClosed: any[] = [];
 
-  private data: string;
   private destroyed: boolean = false;
 
   private log: any = Log.create('modals.service');
@@ -49,34 +49,30 @@ export class ModalsService implements OnDestroy {
     releaseNotes: ReleaseNotesComponent,
     walletVerifyResult: WalletVerifyResultComponent,
     shutdown: ShutdownComponent,
-    changePassword: ChangePasswordComponent
+    changePassword: ChangePasswordComponent,
+    verify2fa: Verify2faComponent,
+    primer: PrimerComponent,
+    tfaSettings: TfaSettingsComponent
   };
 
-  constructor (
+  constructor(
     private _rpc: RpcService,
     private _rpcState: RpcStateService,
-    private _blockStatusService: BlockStatusService,
     private _dialog: MatDialog,
     private _updateService: UpdateService,
     private _securityService: SecutiyService
   ) {
 
-    /* Hook BlockStatus -> open syncing modal */
-    this._blockStatusService.statusUpdates.asObservable().subscribe(status => {
-      this.progress.next(status.syncPercentage);
-      this.openSyncModal(status);
-    });
-
     this.subscribeOnWalletInit();
 
     /* Hook daemon errors -> open daemon modal */
     this._rpcState.errorsStateCall.asObservable()
-    .subscribe(
-      status => {},
-      error => {
+      .subscribe(
+        status => { },
+        error => {
           this.enableClose = true;
           // this.open('daemon', error);
-      });
+        });
 
     this._updateService.isUpdateAvailableSub.subscribe((isUpdateAvailable) => {
       if (isUpdateAvailable) {
@@ -156,7 +152,7 @@ export class ModalsService implements OnDestroy {
       .afterClosed().subscribe(() => {
         const s = this._rpcState.get('ui:walletStatus');
         if (JSON.stringify(status) !== JSON.stringify(s) && !s.isEncrypted) {
-          this.open('encrypt', {forceOpen: true});
+          this.open('encrypt', { forceOpen: true });
         }
       });
 
@@ -183,26 +179,6 @@ export class ModalsService implements OnDestroy {
   /** Check if the modal is already open */
   wasAlreadyOpen(modalName: string): boolean {
     return (this.modal === this.messages[modalName]);
-  }
-
-
-  /** Get progress set by block status */
-  getProgress() {
-    return (this.progress.asObservable());
-  }
-
-  /**
-    * Open the Sync modal if it needs to be opened
-    * @param {any} status  Blockchain status
-    */
-  openSyncModal(status: any): void {
-    // Open syncing Modal
-    if (!this.isOpen && !this.wasManuallyClosed(this.messages['syncing'].name)
-      && (status.networkBH <= 0
-      || status.internalBH <= 0
-      || status.networkBH - status.internalBH > 50)) {
-        this.open('syncing');
-    }
   }
 
   /**
@@ -236,39 +212,86 @@ export class ModalsService implements OnDestroy {
     this.openInitialCreateWallet();
   }
 
-  unlock(): Observable<void> {
-    return Observable.create(obs => {
-      if (this._securityService.isUnlocked()) {
-        obs.next();
-        obs.complete();
-      } else {
-        const modal = this.open('unlock', { data: { }, forceOpen: true, timeout: 30 });
-        modal.afterClosed().subscribe(() => {
-          if (this._securityService.isUnlocked()) {
-            this._rpcState.stateCall('getwalletinfo');
-            obs.next();
-            obs.complete();
+  verify2faToken(): Promise<{ token?: string, success: boolean }> {
+    return new Promise(async (res, rej) => {
+      const modal = this.open("verify2fa", {
+        data: {
+          callback: async (token: string) => {
+            res({ token, success: true });
           }
-        });
-      }
+        }, forceOpen: true
+      });
+
+      await (modal.afterClosed().toPromise());
+      res({ success: false })
     });
   }
 
-  alwaysUnlock(): Observable<void> {
-    return Observable.create(obs => {
-      if (this._securityService.isAlwaysUnlocked()) {
-        obs.next();
-        obs.complete();
-      } else {
-        const modal = this.open('unlock', { data: { alwaysUnlocked: true }, forceOpen: true, timeout: 30 });
-        modal.afterClosed().subscribe(() => {
-          if (this._securityService.isAlwaysUnlocked()) {
-            this._rpcState.stateCall('getwalletinfo');
-            obs.next();
-            obs.complete();
-          }
-        });
+  async getAccessToScope(scope: string): Promise<boolean> {
+    const onFail = async () => {
+      if (scope === AuthScopes.UNLOCK_WALLET) {
+        try {
+          await (this._rpc.call('walletlock').toPromise())
+        } catch (e) {
+          // suppress
+        }
       }
-    });
+    }
+
+    try {
+      const isScopeSelected = await this._securityService.isScopeSelected(scope);
+
+      if (isScopeSelected) {
+        //verify
+        const result = await this.verify2faToken();
+
+        if (!result.success) {
+          await onFail();
+          return false;
+        }
+      } 
+
+      return true;
+    } catch(e) {
+      console.log(e);
+      await onFail();
+      return false;
+    }
+  }
+
+  async unlock(scope: string, data?: any, showStakeOnly?: boolean): Promise<boolean> {
+    const isUnlocked = this._securityService.isUnlocked();
+
+    if (!isUnlocked) {
+      //unlock
+      const modal = this.open('unlock', { data, forceOpen: true, showStakeOnly, timeout: 30 });
+      await (modal.afterClosed().toPromise());
+      if (this._securityService.isUnlocked()) {
+        this._rpcState.stateCall('getwalletinfo');
+      } else {
+        return false;
+      }
+    }
+
+    const hasAccess = await this.getAccessToScope(scope);
+    return hasAccess;
+  }
+
+  async alwaysUnlock(scope: string = AuthScopes.UNLOCK_WALLET, showStakeOnly?: boolean): Promise<boolean> {
+    const isUnlocked = this._securityService.isAlwaysUnlocked();
+
+    if (!isUnlocked) {
+      //unlock
+      const modal = this.open('unlock', { data: { alwaysUnlocked: true }, forceOpen: true, showStakeOnly, timeout: 30 });
+      await (modal.afterClosed().toPromise());
+      if (this._securityService.isAlwaysUnlocked()) {
+        this._rpcState.stateCall('getwalletinfo');
+      } else {
+        return false;
+      }
+    }
+
+    const hasAccess = await this.getAccessToScope(scope);
+    return hasAccess;
   }
 }

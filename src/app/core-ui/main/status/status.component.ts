@@ -8,6 +8,7 @@ import { ModalsService } from '../../../modals/modals.service';
 import { RpcService, RpcStateService } from '../../../core';
 
 import { ConsoleModalComponent } from './modal/help-modal/console-modal.component';
+import { AuthScopes } from 'app/core/models/auth-scopes.enum';
 
 
 @Component({
@@ -103,8 +104,8 @@ export class StatusComponent implements OnInit, OnDestroy {
       error => console.error('walletlock error', error));
   }
 
-  unlockwallet(): void {
-    this._modalsService.open('unlock', {forceOpen: true, showStakeOnly: true});
+  async unlockwallet(): Promise<void> {
+    await this._modalsService.unlock(AuthScopes.UNLOCK_WALLET, null, true);
   }
 
   encryptwallet(): void {
@@ -129,7 +130,13 @@ export class StatusComponent implements OnInit, OnDestroy {
   }
 
   /* Open Debug Console Window */
-  openConsoleWindow() {
+  async openConsoleWindow(): Promise<void> {
+    const isUnlocked = await this._modalsService.unlock(AuthScopes.CONSOLE_ACCESS);
+
+    if (!isUnlocked) {
+      return;
+    }
+
     this.dialog.open(ConsoleModalComponent);
   }
 }

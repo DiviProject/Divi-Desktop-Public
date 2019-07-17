@@ -12,6 +12,7 @@ import { ModalsService } from '../../../../modals/modals.service';
 import { QrCodeModalComponent} from '../qr-code-modal/qr-code-modal.component';
 import { DeleteConfirmationModalComponent } from '../../../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 import { SignatureAddressModalComponent } from '../signature-address-modal/signature-address-modal.component';
+import { AuthScopes } from 'app/core/models/auth-scopes.enum';
 
 @Component({
   selector: 'address-table',
@@ -140,14 +141,10 @@ export class AddressTableComponent implements OnInit, OnChanges {
   public deleteAddress(label: string, address: string): void {
     const dialogRef = this.dialog.open(DeleteConfirmationModalComponent);
     dialogRef.componentInstance.dialogContent = `${label}: ${address}`;
-    dialogRef.componentInstance.onDelete.subscribe(() => {
-      if (this._rpcState.get('locked')) {
-        // unlock wallet and send transaction
-        this._modals.open('unlock', {
-          forceOpen: true, timeout: 3, callback: this.deleteAddressCallBack.bind(this, address)
-        });
-      } else {
-        // wallet already unlocked
+    dialogRef.componentInstance.onDelete.subscribe(async () => {
+      const isUnlocked = await this._modals.unlock(AuthScopes.ADDRESS_BOOK_REMOVE);
+
+      if (isUnlocked) {
         this.deleteAddressCallBack(address);
       }
     });
