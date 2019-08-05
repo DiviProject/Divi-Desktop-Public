@@ -206,6 +206,9 @@ function initIpcListener() {
         case 'abandon-primer':
           primerManager.abandon();
           return onSuccess();
+        case 'retry-primer-restore':
+          primerManager.retry();
+          return onSuccess();
         // primer
         case 'clear-cache':
           return _util.removeFolders(TESTNET, ['blocks', 'chainstate', 'sporks', 'zerocoin'], handle);

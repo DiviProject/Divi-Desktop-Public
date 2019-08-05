@@ -7,7 +7,7 @@
     <app-balance type="balance" [types]="['total', 'spendable']"></app-balance>
   </div>
 
-  <mat-tab-group [@.disabled]="true" *ngIf="walletInited">
+  <mat-tab-group [@.disabled]="true">
     <mat-tab [@.disabled]="true" label="Recent Transactions">
       <div class="recent-transactions" fxFlex="100">
         <app-header>

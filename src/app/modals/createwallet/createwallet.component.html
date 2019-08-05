@@ -21,15 +21,11 @@
       </div>
 
       <div *ngIf="!walletStatus.isBackedUp" class="section create-restore">
-        <div class="title">Backup and Restore your wallet.</div>
+        <div class="title">Backup your wallet.</div>
         <p>
           Recovery Phrase is a backup key to your coins. With it you can easily recover your wallet on another PC.
         </p>
         <div class="actions">
-          <button mat-raised-button color="primary" class="create-wallet-action-button" (click)="initialize(3);">
-            <mat-icon fontSet="partIcon" fontIcon="part-lock-open"></mat-icon>
-            Restore wallet
-          </button>
           <button mat-raised-button color="primary" class="create-wallet-action-button" (click)="initialize(2);">
             <mat-icon fontSet="partIcon" fontIcon="part-lock-open"></mat-icon>
             Backup wallet

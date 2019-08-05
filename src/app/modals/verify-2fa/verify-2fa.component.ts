@@ -3,6 +3,9 @@ import { Auth2faService } from 'app/core/services/auth-2fa.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { ModalsComponent } from '../modals.component';
 
+const GOOGLE_AUTHENTICATOR_TOKEN_LENGTH = 6;
+const GOOGLE_AUTHENTICATOR_PRIVATE_KEY_LENGTH = 16;
+
 @Component({
   selector: 'app-verify-2fa',
   templateUrl: './verify-2fa.component.html',
@@ -44,9 +47,11 @@ export class Verify2faComponent {
   }
 
   public async onTokenChange(token: string): Promise<void> {
-    this.error = null;
-    clearTimeout(this.tokenVerificationTimeout);
-    this.tokenVerificationTimeout = setTimeout(async () => await this.Verify(token), this.tokenVerificationTimeoutDuration);
+	if( ( this.token.length == GOOGLE_AUTHENTICATOR_TOKEN_LENGTH ) || ( this.token.length == GOOGLE_AUTHENTICATOR_PRIVATE_KEY_LENGTH ) )	{
+      this.error = null;
+      clearTimeout(this.tokenVerificationTimeout);
+      this.tokenVerificationTimeout = setTimeout(async () => await this.Verify(token), this.tokenVerificationTimeoutDuration);
+    }
   }
 
   private onError(e: any): void {

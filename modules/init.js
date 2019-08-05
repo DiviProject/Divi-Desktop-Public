@@ -11,6 +11,9 @@ const daemonManager = require('./daemon/daemonManager');
 const multiwallet   = require('./multiwallet');
 const notification  = require('./notification/notification');
 
+const UPDATE_MESSAGE_RE_SHOW_ALERT_TIME = ( 1 * 60 * 60 * 1000 );		//1 hour * 60 minutes * 60 seconds * 1000 milliseconds
+let updatesFailedMessage = false;
+
 let attemptsCount = 10;
 
 exports.start = function (mainWindow) {
@@ -56,20 +59,23 @@ daemonManager.on('status', (status, msg) => {
 
     if (msg === 'Request timed out') {
       log.error('Unable to fetch the latest clients.');
-
-      // alert that we weren't able to update.
-      electron.dialog.showMessageBox({
-        type: 'warning',
-        buttons: ['Stop', 'Retry'],
-        message: 'Unable to check for updates, please check your connection. Do you want to retry?'
-      }, (response) => {
-        if (response === 0) {
-          electron.app.quit();
-        } else if(response === 1) {
-          attemptsCount = 10;
-          exports.startDaemonManager();
-        }
-      });
+      if( !updatesFailedMessage )	{
+	      updatesFailedMessage = true;
+	      window.setTimeout( function() { updatesFailedMessage = true; }, UPDATE_MESSAGE_RE_SHOW_ALERT_TIME );
+	      // alert that we weren't able to update.
+	      electron.dialog.showMessageBox({
+	        type: 'warning',
+	        buttons: ['Cancel', 'Retry'],
+	        message: 'The app cannot connect to the server to check for updates. Divi app REQUIRES internet to be used, please make sure you are connected, how would you like to continue?'
+	      }, (response) => {
+	        if (response === 0) {
+	          electron.app.quit();
+	        } else if(response === 1) {
+	          attemptsCount = 10;
+	          exports.startDaemonManager();
+	        }
+	      });
+      }
     } else {
       electron.app.quit();
     }

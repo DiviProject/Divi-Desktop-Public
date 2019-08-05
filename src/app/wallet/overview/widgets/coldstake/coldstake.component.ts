@@ -58,6 +58,10 @@ export class ColdstakeComponent {
     const dialogRef = this.dialog.open(ZapColdstakingComponent);
   }
 
+  openUnlockWalletModal(): void {
+    this._modals.open('unlock', { forceOpen: true, showStakeOnly: false, stakeOnly: true }); // unlock
+  }
+
   openColdStakeModal(): void {
     this._modals.open('coldStake', { forceOpen: true, type: 'cold' });
   }

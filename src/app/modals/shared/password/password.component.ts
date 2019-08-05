@@ -4,7 +4,7 @@ import { Log } from 'ng2-logger';
 import { IPassword } from './password.interface';
 import { MatDialogRef } from '@angular/material';
 
-import { RpcService, RpcStateService } from '../../../core';
+import { RpcService, RpcStateService, SecurityService } from '../../../core';
 import { SnackbarService } from '../../../core/snackbar/snackbar.service';
 import { ModalsComponent } from '../../modals.component';
 import { Observable } from 'rxjs/Observable';
@@ -65,6 +65,7 @@ export class PasswordComponent implements OnDestroy {
   constructor(private _rpc: RpcService,
               private _rpcState: RpcStateService,
               private flashNotification: SnackbarService,
+              private securityService: SecurityService,
               public dialogRef: MatDialogRef<ModalsComponent>) {
   }
 
@@ -94,7 +95,7 @@ export class PasswordComponent implements OnDestroy {
     this.backEmitter.emit();
   }
 
-  public forceEmit(): void {
+  public async forceEmit(): Promise<void> {
     if (this.emitPassword) {
       // emit password
       this.sendPassword();
@@ -102,8 +103,12 @@ export class PasswordComponent implements OnDestroy {
 
     if (this.emitUnlock) {
       // emit unlock
-      this.rpc_lock().subscribe(
-        () => this.rpc_unlock());
+      try {
+        await this.internalUnlock();
+      } catch (e) {
+        this.log.er('rpc_unlock_failed: unlock failed - wrong password?', e);
+        this.flashNotification.open('Unlock failed - password was incorrect', 'err');
+      }
     }
   }
 
@@ -122,44 +127,30 @@ export class PasswordComponent implements OnDestroy {
     this.passwordEmitter.emit(pass);
   }
 
-  private rpc_lock(): Observable<void> {
-    return this._rpc.call('walletlock')
-    .do(success => this._rpcState.stateCall('getwalletinfo'),
-      error => console.error('walletlock error', error));
-  }
-
   /** Unlock the wallet
     * TODO: This should be moved to a service...
     */
-  private rpc_unlock(): void {
+  private async internalUnlock(): Promise<void> {
+    await this.securityService.lock();
     this.checkAndFallbackToStaking();
-    this._rpc.call('walletpassphrase', [
-        this.password,
-        +(this.stakeOnly ? 0 : this.unlockTimeout),
-        this.stakeOnly
-      ])
-      .subscribe(
-        success => {
-          // update state
-          this._rpcState.stateCall('getwalletinfo');
+    await this.securityService.unlock(
+      this.password,
+      +(this.stakeOnly ? 0 : this.unlockTimeout),
+      this.stakeOnly
+    );
 
-          let _subs = this._rpcState.observe('getwalletinfo', 'encryptionstatus')
-            .takeWhile(() => !this.destroyed)
-            .skip(1)
-            .subscribe(
-              encryptionstatus => {
-                // hook for unlockEmitter, warn parent component that wallet is unlocked!
-                this.unlockEmitter.emit(encryptionstatus);
-                if (_subs) {
-                  _subs.unsubscribe();
-                  _subs = null;
-                }
-              });
-        },
-        error => {
-          this.log.er('rpc_unlock_failed: unlock failed - wrong password?', error);
-          this.flashNotification.open('Unlock failed - password was incorrect', 'err');
-        });
+    let _subs = this._rpcState.observe('getwalletinfo', 'encryptionstatus')
+    .takeWhile(() => !this.destroyed)
+    .skip(1)
+    .subscribe(
+      encryptionstatus => {
+        // hook for unlockEmitter, warn parent component that wallet is unlocked!
+        this.unlockEmitter.emit(encryptionstatus);
+        if (_subs) {
+          _subs.unsubscribe();
+          _subs = null;
+        }
+      });
   }
 
   /**

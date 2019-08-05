@@ -54,6 +54,9 @@ export class SettingsService {
         partReceived: true,
         partSent: true,
         other: true
+      },
+      combineUtxo: {
+        onSend: true
       }
     },
     i2p: {},
@@ -70,6 +73,14 @@ export class SettingsService {
 
     if (settings.main.primer == undefined) {
       settings.main.primer = true;
+    }
+
+    if (settings.combineUtxo == undefined) {
+      settings.combineUtxo = { onSend: true };
+    }
+
+    if (settings.combineUtxo.onSend == undefined) {
+      settings.combineUtxo.onSendr = true;
     }
 
     return settings;

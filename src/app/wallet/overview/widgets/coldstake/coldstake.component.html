@@ -10,6 +10,14 @@
     <div class="subtitle">Waiting for wallet</div>
   </mat-card>
 
+  <mat-card *ngIf="_coldstake.walletInitialized && _coldstake.coldStakingEnabled === undefined" class="staking-node inactive">
+    <button mat-raised-button color="primary" class="pull-left" (click)="openUnlockWalletModal()" matTooltip="Unlock wallet to enable cold staking">
+      <mat-icon fontSet="partIcon" fontIcon="part-lock"></mat-icon>
+    </button>
+    <div class="title">Cold Staking Node</div>
+    <div class="subtitle">Unlock to check</div>
+  </mat-card>
+
   <mat-card *ngIf="_coldstake.walletInitialized && _coldstake.coldStakingEnabled === false" class="staking-node inactive">
     <button mat-raised-button color="primary" class="pull-left" (click)="openColdStakeModal()" matTooltip="Add Cold Staking node key">
       <mat-icon fontSet="partIcon" fontIcon="part-plus"></mat-icon>

@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Log } from 'ng2-logger';
 
-import { RpcStateService, UpdateService, SecutiyService, RpcService } from '../core';
+import { RpcStateService, UpdateService, SecurityService, RpcService } from '../core';
 
 /* modals */
 import { CreateWalletComponent } from './createwallet/createwallet.component';
@@ -21,6 +21,7 @@ import { ShutdownComponent } from './shutdown/shutdown.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { Verify2faComponent } from './verify-2fa/verify-2fa.component';
 import { PrimerComponent } from './primer/primer.component';
+import { CombineUtxoComponent } from './combine-utxo/combine-utxo.component';
 import { TfaSettingsComponent } from './tfa-settings/tfa-settings.component';
 import { AuthScopes } from 'app/core/models/auth-scopes.enum';
 
@@ -52,6 +53,7 @@ export class ModalsService implements OnDestroy {
     changePassword: ChangePasswordComponent,
     verify2fa: Verify2faComponent,
     primer: PrimerComponent,
+    combineUtxo: CombineUtxoComponent,
     tfaSettings: TfaSettingsComponent
   };
 
@@ -60,7 +62,7 @@ export class ModalsService implements OnDestroy {
     private _rpcState: RpcStateService,
     private _dialog: MatDialog,
     private _updateService: UpdateService,
-    private _securityService: SecutiyService
+    private _securityService: SecurityService
   ) {
 
     this.subscribeOnWalletInit();
@@ -224,6 +226,21 @@ export class ModalsService implements OnDestroy {
 
       await (modal.afterClosed().toPromise());
       res({ success: false })
+    });
+  }
+
+  combineUtxo(): Promise<boolean> {
+    return new Promise(async (res, rej) => {
+      const modal = this.open("combineUtxo", {
+        data: {
+          callback: async (isCombined: boolean) => {
+            res(isCombined);
+          }
+        }, forceOpen: true
+      });
+
+      await (modal.afterClosed().toPromise());
+      res(false);
     });
   }
 

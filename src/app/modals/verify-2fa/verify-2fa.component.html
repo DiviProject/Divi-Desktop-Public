@@ -1,19 +1,20 @@
 <div class="container">
   <div class="content">
     <div class="section">
-      <div class="title">Enter 2FA Passcode</div>
+      <div class="title">Please enter the 2FA Passcode</div>
+      <p>Please enter the code from your Google Authenticator App or you enter your Private Key for Google Authenticator.</p>
         <div class="error-message" *ngIf="!!error">
           <p>{{error}}</p>
         </div>
 
         <mat-form-field>
-          <input matInput name="token" id="token" type="text" [(ngModel)]="token" (ngModelChange)="onTokenChange($event)" placeholder="Passcode" />
+          <input matInput name="token" id="token" type="text" [(ngModel)]="token" (ngModelChange)="onTokenChange($event)" placeholder="Passcode" maxlength="16" />
         </mat-form-field>
         <div class="actions">
           <button mat-raised-button 
             color="primary" 
             (click)="close()">
-            Close
+            Cancel
           </button>
         </div>
     </div>

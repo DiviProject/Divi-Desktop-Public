@@ -54,8 +54,7 @@ export class PrimerComponent implements OnDestroy {
   }
 
   async retry(): Promise<void> {
-    this.primerService.clean();
-    await this.primerService.restore(true);
+    await this.primerService.retry();
   }
 
   close(): void {

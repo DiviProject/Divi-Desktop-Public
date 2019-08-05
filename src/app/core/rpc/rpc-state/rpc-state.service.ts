@@ -125,7 +125,9 @@ export class RpcStateService extends StateService implements OnDestroy {
       .subscribe(async status => {
         if (['Unencrypted', 'Unlocked, staking only', 'Unlocked'].includes(status)) {
           this.stateCall('getstakinginfo');
+        }
 
+        if (['Unencrypted', 'Unlocked'].includes(status)) {
           //cache hdseed
           const { hdseed } = await (this._rpc.call('dumphdinfo').toPromise());
           this.set('hdseed', hdseed);

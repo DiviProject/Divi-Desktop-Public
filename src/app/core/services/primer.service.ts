@@ -119,6 +119,13 @@ export class PrimerService {
         this.historyLogs.push('Starting daemon...');
         await this.invocationService.limited(() => (this.daemonService.restart().toPromise()), 10 * 60 * 1000); //10 mins max
         break;
+      case 'retry':
+          this.enableAbandon.next(false);
+          this.historyLogs.push('Retrying...');
+          await this.invocationService.delay(2 * 1000); //5 sec
+          this.isInProgressSub.next(false);
+          await this.restore(true);
+          break;
       case 'error':
         this.enableAbandon.next(false);
         throw eventData;
@@ -131,6 +138,10 @@ export class PrimerService {
 
   public async abandon(): Promise<void> {
     await this.rpc.call('abandon-primer');
+  }
+
+  public async retry(): Promise<void> {
+    await this.rpc.call('retry-primer-restore');
   }
 
   public async restore(manual?: boolean, delayStart?: boolean): Promise<void> {

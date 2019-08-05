@@ -15,7 +15,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   constructor(
     private rpcState: RpcStateService,
     private txService: TransactionsStateService,
-    private daemonService: DaemonService
+    private daemonService: DaemonService,
     ) { }
 
   ngOnInit() {
@@ -48,6 +48,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .subscribe(state => {
         this.walletInited = state.isFullyLoaded;
         this.walletLoadingStatus = state.isWalletLoading ? state.errorMessage : '';
+
+        if (state.isWalletLoading) {
+          this.initTransactions();
+        }
       });
   }
 }

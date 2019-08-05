@@ -1,0 +1,24 @@
+<div class="container disable-select">
+  <div class="content">
+    <div class="section">
+      <div class="title">Combine UTXO</div>
+      <div class="description">
+        By performing this action, you will combine all your transaction outputs into one, effectively resetting your coin age.
+        This will affect your staking for a short period of time. Are you sure?
+      </div>
+
+      <div class="actions">
+        <button mat-raised-button 
+                color="primary" 
+                (click)="combine()">
+          Yes
+        </button>
+        <button mat-raised-button 
+                color="primary" 
+                (click)="close()">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

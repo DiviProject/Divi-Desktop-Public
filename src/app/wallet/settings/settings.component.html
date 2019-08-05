@@ -10,7 +10,7 @@
           </h4>
 
           <div class="card row">
-            <input type="checkbox" (change)="onSettingsChange()" [(ngModel)]="settings.main.autostart"> Start Divi on system login
+            <input type="checkbox" (change)="onSettingsChange()" [(ngModel)]="settings.main.autostart"> Start Divi app with user login
           </div>
 
           <div class="card row">
@@ -38,7 +38,7 @@
           </div>
 
           <div fxFlex="1 1 150px">
-            <h4 matTooltip="Check the blockchain for any transactions your wallet may have missed. Can help solve transaction issues.">Rescan of the blockchain</h4>
+            <h4 matTooltip="Check the blockchain for any transactions your wallet may have missed. Can help solve transaction issues.">Rescan the blockchain</h4>
 
             <button class="validate mat-raised-button mat-primary"
                     color="primary"
@@ -107,6 +107,35 @@
                   (click)="onPrimerRestoreClick()">
             Manual Restore
           </button>
+        </div>
+      </mat-card>
+      <!-- combine utxo -->
+      <mat-card class="pay-to" style="margin: 10px; margin-left: 30px; margin-right: 30px;">
+        <div>
+          <h2>
+            Combine UTXOs
+          </h2>
+          <h4>
+            Automatically combine UTXOs
+          </h4>
+        </div>
+
+        <div class="cards" style="margin-bottom: 20px">
+          <div class="card row">
+            <input type="checkbox" (change)="onSettingsChange()" [(ngModel)]="settings.combineUtxo.onSend"> On send
+          </div>
+        </div>
+        <div *ngIf="isFullySynced && enableCombine">
+          <h4>
+            Manually combine UTXOs
+          </h4>
+          <div class="cards" style="margin-bottom: 20px">
+            <div class="card row">
+              <button mat-raised-button color="primary" (click)="combineUtxos()">
+                Combine UTXOs
+              </button>
+            </div>
+          </div>
         </div>
       </mat-card>
     </mat-tab>

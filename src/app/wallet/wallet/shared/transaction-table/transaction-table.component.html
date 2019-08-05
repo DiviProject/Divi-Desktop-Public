@@ -1,156 +1,144 @@
-<mat-progress-bar mode="indeterminate" *ngIf="!(blockStatusService.isFullSynced | async)"></mat-progress-bar>
+<mat-progress-bar mode="indeterminate" *ngIf="!(blockStatusService.isFullSynced | async) || !walletInitialized"></mat-progress-bar>
 <div class="no-results" *ngIf="txService.txs.length === 0 && (blockStatusService.isFullSynced | async)">
   No transactions yet
 </div>
 
-<div class="no-results" *ngIf="!(blockStatusService.isFullSynced | async)">
-  Synchronizing...
-</div>
+<mat-expansion-panel class="history-list-header" *ngIf="display.header" [hideToggle]="true" #matExpansionPanel>
+  <mat-expansion-panel-header fxLayout="row" fxLayoutGap="10px" layout-padding (click)="expandPanel(matExpansionPanel, $event)">
+    <!-- Date -->
+    <mat-panel-title fxFlex="0 0 137px" fxFlex.lt-md="100" *ngIf="display.date" (click)="sort('blocktime')">
+      <span>Time</span>
+      <span class="mat-expansion-indicator"
+            [ngClass]="{'asc': txService.filters.sortDirection === 'asc', 'desc': txService.filters.sortDirection === 'desc'}" 
+            *ngIf="txService.filters.sort === 'blocktime'"></span>
+    </mat-panel-title>
 
-<div *ngIf="blockStatusService.isFullSynced | async">
-  <mat-expansion-panel class="history-list-header" *ngIf="display.header" [hideToggle]="true" #matExpansionPanel>
-    <mat-expansion-panel-header fxLayout="row" fxLayoutGap="10px" layout-padding (click)="expandPanel(matExpansionPanel, $event)">
+    <!-- Confirmations -->
+    <mat-panel-title fxFlex="0 0 45px" fxFlex.lt-md="100" *ngIf="display.confirmations">
+    </mat-panel-title>
+
+    <!-- Category -->
+    <mat-panel-title fxFlex="1 0 175px" fxFlex.lt-md="100" *ngIf="display.category" (click)="sort('category')">
+      <span>Category</span>
+      <span class="mat-expansion-indicator"
+            [ngClass]="{'asc': txService.filters.sortDirection === 'asc', 'desc': txService.filters.sortDirection === 'desc'}" 
+            *ngIf="txService.filters.sort === 'category'"></span>
+    </mat-panel-title>
+
+    <!-- Amount -->
+    <mat-panel-title fxFlex="1 0 155px" fxFlex.lt-md="100" *ngIf="display.amount" class="history_amount" (click)="sort('amount')">
+        <span>Amount</span>
+        <span class="mat-expansion-indicator" 
+              [ngClass]="{'asc': txService.filters.sortDirection === 'asc', 'desc': txService.filters.sortDirection === 'desc'}" 
+              *ngIf="txService.filters.sort === 'amount'"></span>
+    </mat-panel-title>
+
+  </mat-expansion-panel-header>
+</mat-expansion-panel>
+
+<ng-container *ngFor="let tx of txService.txs">
+  <mat-expansion-panel class="history-list" [expanded]="!!tx.txid && tx.txid === expandedTransactionID" [hideToggle]="true" #txItemPanel>
+    <mat-expansion-panel-header fxLayout="row" fxLayoutGap="10px" layout-padding (click)="showExpandedTransactionDetail(tx)">
+      <!-- Actions -->
+      <mat-panel-title fxFlex="0 0 5px" fxFlex.lt-md="100" class="history_actions">
+        <img src="assets/img/dots.png"/>
+      </mat-panel-title>
+      
       <!-- Date -->
-      <mat-panel-title fxFlex="0 0 137px" fxFlex.lt-md="100" *ngIf="display.date" (click)="sort('blocktime')">
-        <span>Time</span>
-        <span class="mat-expansion-indicator"
-              [ngClass]="{'asc': txService.filters.sortDirection === 'asc', 'desc': txService.filters.sortDirection === 'desc'}" 
-              *ngIf="txService.filters.sort === 'blocktime'"></span>
+      <mat-panel-title fxFlex="0 0 140px" fxFlex.lt-md="100" *ngIf="display.date" class="history_date" matTooltip="The time and date the transaction occurred">
+        {{ (tx.displayInfo.date | date:'HH:mm, d MMM yyyy').toUpperCase() }}
       </mat-panel-title>
-  
-      <!-- Confirmations -->
-      <mat-panel-title fxFlex="0 0 45px" fxFlex.lt-md="100" *ngIf="display.confirmations">
-      </mat-panel-title>
-  
-      <!-- Category -->
-      <mat-panel-title fxFlex="1 0 175px" fxFlex.lt-md="100" *ngIf="display.category" (click)="sort('category')">
-        <span>Category</span>
-        <span class="mat-expansion-indicator"
-              [ngClass]="{'asc': txService.filters.sortDirection === 'asc', 'desc': txService.filters.sortDirection === 'desc'}" 
-              *ngIf="txService.filters.sort === 'category'"></span>
-      </mat-panel-title>
-  
-      <!-- Amount -->
-      <mat-panel-title fxFlex="1 0 155px" fxFlex.lt-md="100" *ngIf="display.amount" class="history_amount" (click)="sort('amount')">
-          <span>Amount</span>
-          <span class="mat-expansion-indicator" 
-                [ngClass]="{'asc': txService.filters.sortDirection === 'asc', 'desc': txService.filters.sortDirection === 'desc'}" 
-                *ngIf="txService.filters.sort === 'amount'"></span>
-      </mat-panel-title>
-  
-    </mat-expansion-panel-header>
-  </mat-expansion-panel>
-  
-  <ng-container *ngFor="let tx of txService.txs">
-    <mat-expansion-panel class="history-list" [expanded]="!!tx.txid && tx.txid === expandedTransactionID" [hideToggle]="true" #txItemPanel>
-      <mat-expansion-panel-header fxLayout="row" fxLayoutGap="10px" layout-padding (click)="showExpandedTransactionDetail(tx)">
-        <!-- Actions -->
-        <mat-panel-title fxFlex="0 0 5px" fxFlex.lt-md="100" class="history_actions">
-          <img src="assets/img/dots.png"/>
-        </mat-panel-title>
-        
-        <!-- Date -->
-        <mat-panel-title fxFlex="0 0 140px" fxFlex.lt-md="100" *ngIf="display.date" class="history_date" matTooltip="The time and date the transaction occurred">
-          {{ (tx.displayInfo.date | date:'HH:mm, d MMM yyyy').toUpperCase() }}
-        </mat-panel-title>
-  
-        <!-- Currency icon -->
-        <mat-panel-title fxFlex="1 0 35px" fxFlex.lt-md="100" *ngIf="display.currency" class="history_cur_icon">
-          <div class="currency">
-            <img src="assets/img/logo-white.png"/>
-          </div>
-        </mat-panel-title>
-  
-        <!-- Category icon -->
-        <mat-panel-title fxFlex="1 0 15px" fxFlex.lt-md="100" *ngIf="display.category" class="history_cat_icon"
-                          [ngSwitch]="tx.category">
-          <span *ngSwitchCase="'stake_reward'" class="tx-type staked">
-            <mat-icon fontSet="partIcon" fontIcon="part-arrow-right" matTooltip="Incoming transaction"></mat-icon>
-          </span>
-          <span *ngSwitchCase="'mn_reward'" class="tx-type reward">
-              <mat-icon fontSet="partIcon" fontIcon="part-arrow-right" matTooltip="Incoming transaction"></mat-icon>
-          </span>
-          <span *ngSwitchCase="'lottery'" class="tx-type lottery">
-            <mat-icon fontSet="partIcon" fontIcon="part-arrow-right" matTooltip="Incoming transaction"></mat-icon>
-          </span>
-          <span *ngSwitchCase="'receive'" class="tx-type receive">
-            <mat-icon fontSet="partIcon" fontIcon="part-arrow-right" matTooltip="Incoming transaction"></mat-icon>
-          </span>
-          <span *ngSwitchCase="'send'" class="tx-type send">
-              <mat-icon fontSet="partIcon" fontIcon="part-arrow-left"></mat-icon>
-          </span>
-          <span *ngSwitchCase="'move'" class="tx-type moved">
-            <img src="assets/icons/SVG/move.svg"/>
-          </span>
-        </mat-panel-title>
-  
-        <!-- Address -->
-        <mat-panel-title fxFlex="1 0 calc(100% - 590px)" fxFlex.lt-md="100" *ngIf="display.senderAddress" class="history_longAddress">
-          <div class="address" matTooltip="Address/Account that received the transaction">
-            {{ tx.category === 'mn_reward' ? (tx.displayInfo.account || tx.displayInfo.address) : tx.displayInfo.address }}
-          </div>
-        </mat-panel-title>
-  
-        <!-- Amount -->
-        <mat-panel-title fxFlex="1 0 190px" fxFlex.lt-md="100" *ngIf="display.amount" class="history_amount">
-          <span mat-line>
-            <span class="amount" matTooltip="Amount of transaction">
-              {{tx.displayInfo.amount}}
-              <span class="currency">DIVI</span>
-            </span>
-          </span>
-        </mat-panel-title>
-  
-        <!-- Status -->
-        <mat-panel-title fxFlex="1 0 120px" fxFlex.lt-md="100" *ngIf="display.amount" class="history_confirmation">
-          <span class="confirm {{tx.confirmationInfo.style}}" [matTooltip]="tx.confirmationInfo.tooltip">
-            {{ tx.confirmationInfo.label }} <mat-icon fontSet="partIcon" [fontIcon]="tx.confirmationInfo.icon"></mat-icon>
-          </span>
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-  
-      <div class="container history_container" fxLayoutWrap layout-padding>
-  
-        <div fxFlex="1 1 calc(100% - 260px)" fxLayout="column">
-          <!-- To/from (detail) -->
-          <div *ngIf="tx.category === 'mn_reward'" class="tx-detail-item" fxFlex>
-            <span fxFlex="0 0 80px">Address:</span>
-            <span fxFlex="1 1 calc(100% - 80px)" class="to-from-address">{{ tx.displayInfo.address }}</span>
-          </div>
 
-          <div *ngIf="tx.category === 'send'" class="tx-detail-item" fxFlex>
-            <span fxFlex="0 0 80px">To:</span>
-            <span fxFlex="1 1 calc(100% - 80px)" class="to-from-address">{{ tx.displayInfo.toAddress }}</span>
-          </div>
-          <!-- TX ID (detail) -->
-          <div class="tx-detail-item" fxFlex (click)="goToDiviScan(tx.txid)">
-            <span fxFlex="0 0 80px">TXID:</span>
-            <span fxFlex="1 1 calc(100% - 80px)" class="tx-detail-link">{{tx.txid}}</span>
-          </div>
+      <!-- Currency icon -->
+      <mat-panel-title fxFlex="1 0 35px" fxFlex.lt-md="100" *ngIf="display.currency" class="history_cur_icon">
+        <div class="currency">
+          <img src="assets/img/logo-white.png"/>
         </div>
-  
-        <div fxFlex="0 0 260px" fxLayout="column">
-          <!-- TX fee (detail) -->
-          <div class="tx-detail-item text-right" fxFlex>
-            <span>Fee:</span>
-            <span class="mat-right">{{tx.fee ? tx.fee : 0}} DIVI</span>
-          </div>
-          <!-- Net amount (detail) -->
-          <div class="tx-detail-item text-right" fxFlex>
-            <span>Net amount:</span>
-            <span class="mat-right">{{ tx.displayInfo.netAmount }} DIVI</span>
-          </div>
+      </mat-panel-title>
+
+      <!-- Category icon -->
+      <mat-panel-title fxFlex="1 0 15px" fxFlex.lt-md="100" *ngIf="display.category" class="history_cat_icon"
+                        [ngSwitch]="tx.category">
+        <span *ngSwitchCase="'stake_reward'" class="tx-type staked">
+          <mat-icon fontSet="partIcon" fontIcon="part-arrow-right" matTooltip="Incoming transaction"></mat-icon>
+        </span>
+        <span *ngSwitchCase="'receive'" class="tx-type receive">
+          <mat-icon fontSet="partIcon" fontIcon="part-arrow-right" matTooltip="Incoming transaction"></mat-icon>
+        </span>
+        <span *ngSwitchCase="'send'" class="tx-type send">
+            <mat-icon fontSet="partIcon" fontIcon="part-arrow-left"></mat-icon>
+        </span>
+        <span *ngSwitchCase="'move'" class="tx-type moved">
+          <img src="assets/icons/SVG/move.svg"/>
+        </span>
+      </mat-panel-title>
+
+      <!-- Address -->
+      <mat-panel-title fxFlex="1 0 calc(100% - 590px)" fxFlex.lt-md="100" *ngIf="display.senderAddress" class="history_longAddress">
+        <div class="address" matTooltip="Address/Account that received the transaction">
+          {{ tx.category === 'mn_reward' ? (tx.displayInfo.account || tx.displayInfo.address) : tx.displayInfo.address }}
         </div>
-      </div><!-- .history_cointainer -->
-    </mat-expansion-panel>
-  </ng-container>
-  
-  <app-paginator
-    #paginator
-    *ngIf="display.pagination && txService.txs.length > 0"
-    [length]="txService.txCount"
-    [pageSize]="txService.MAX_TXS_PER_PAGE"
-    [pageSizeOptions]="txService.PAGE_SIZE_OPTIONS"
-    (page)="pageChanged($event)">
-  </app-paginator>
-</div>
+      </mat-panel-title>
+
+      <!-- Amount -->
+      <mat-panel-title fxFlex="1 0 190px" fxFlex.lt-md="100" *ngIf="display.amount" class="history_amount">
+        <span mat-line>
+          <span class="amount" matTooltip="Amount of transaction">
+            {{tx.displayInfo.amount}}
+            <span class="currency">DIVI</span>
+          </span>
+        </span>
+      </mat-panel-title>
+
+      <!-- Status -->
+      <mat-panel-title fxFlex="1 0 120px" fxFlex.lt-md="100" *ngIf="display.amount" class="history_confirmation">
+        <span class="confirm {{tx.confirmationInfo.style}}" [matTooltip]="tx.confirmationInfo.tooltip">
+          {{ tx.confirmationInfo.label }} <mat-icon fontSet="partIcon" [fontIcon]="tx.confirmationInfo.icon"></mat-icon>
+        </span>
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <div class="container history_container" fxLayoutWrap layout-padding>
+
+      <div fxFlex="1 1 calc(100% - 260px)" fxLayout="column">
+        <!-- To/from (detail) -->
+        <div *ngIf="tx.category === 'mn_reward'" class="tx-detail-item" fxFlex>
+          <span fxFlex="0 0 80px">Address:</span>
+          <span fxFlex="1 1 calc(100% - 80px)" class="to-from-address">{{ tx.displayInfo.address }}</span>
+        </div>
+
+        <div *ngIf="tx.category === 'send'" class="tx-detail-item" fxFlex>
+          <span fxFlex="0 0 80px">To:</span>
+          <span fxFlex="1 1 calc(100% - 80px)" class="to-from-address">{{ tx.displayInfo.toAddress }}</span>
+        </div>
+        <!-- TX ID (detail) -->
+        <div class="tx-detail-item" fxFlex (click)="goToDiviScan(tx.txid)">
+          <span fxFlex="0 0 80px">TXID:</span>
+          <span fxFlex="1 1 calc(100% - 80px)" class="tx-detail-link">{{tx.txid}}</span>
+        </div>
+      </div>
+
+      <div fxFlex="0 0 260px" fxLayout="column">
+        <!-- TX fee (detail) -->
+        <div class="tx-detail-item text-right" fxFlex>
+          <span>Fee:</span>
+          <span class="mat-right">{{tx.fee ? tx.fee : 0}} DIVI</span>
+        </div>
+        <!-- Net amount (detail) -->
+        <div class="tx-detail-item text-right" fxFlex>
+          <span>Net amount:</span>
+          <span class="mat-right">{{ tx.displayInfo.netAmount }} DIVI</span>
+        </div>
+      </div>
+    </div><!-- .history_cointainer -->
+  </mat-expansion-panel>
+</ng-container>
+
+<app-paginator
+  #paginator
+  *ngIf="display.pagination && txService.txs.length > 0"
+  [length]="txService.txCount"
+  [pageSize]="txService.MAX_TXS_PER_PAGE"
+  [pageSizeOptions]="txService.PAGE_SIZE_OPTIONS"
+  (page)="pageChanged($event)">
+</app-paginator>

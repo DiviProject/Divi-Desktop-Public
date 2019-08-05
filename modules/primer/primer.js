@@ -106,7 +106,7 @@ exports.init = function(mainWindow) {
 };
 
 function sendEvent(eventType, eventData) {
-    if (!mainWindowRef || (!!isAbandoned && eventType !== 'abandon')) {
+    if (!mainWindowRef || (!!isAbandoned && eventType !== 'abandon' && eventType !== 'retry')) {
         return;
     }
     mainWindowRef.webContents.send('primer', eventType, eventData);
@@ -195,6 +195,11 @@ class PrimerManager {
     async abandon() {
         _abandonDownload();
         sendEvent('abandon', null);
+    }
+
+    retry() {
+        _abandonDownload();
+        sendEvent('retry', null);
     }
 }
 

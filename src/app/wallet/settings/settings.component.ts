@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Location } from '@angular/common';
 
 import { ModalsService } from '../../modals/modals.module';
-import { RpcService, RpcStateService, DaemonService, SnackbarService, DiviService, AppSettingsService, SettingsService } from '../../core';
+import { RpcService, RpcStateService, BlockStatusService, DaemonService, SnackbarService, DiviService, AppSettingsService, SettingsService } from '../../core';
 import { environment } from '../../../environments/environment';
 import { UserSettingsService } from 'app/core/services/user-settings.service';
 import { UserInfoService } from 'app/core/services/user-info.service';
@@ -28,6 +28,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
   public encryptionStatus: string = null;
   private destroyed: boolean = false;
   public walletInited: boolean = false;
+  private isFullySynced: boolean = false;
+  private enableCombine: boolean = false;
   
   public userSettings: {
     twoFactorAuthEnabled: boolean,
@@ -52,8 +54,15 @@ export class SettingsComponent implements OnInit, OnDestroy {
     private daemonService: DaemonService,
     private appSettingsService: AppSettingsService,
     private userSettingsService: UserSettingsService,
-    private userInfoService: UserInfoService
-  ) { }
+    private userInfoService: UserInfoService,
+    private blockStatusService: BlockStatusService
+  ) {
+    this.blockStatusService.isFullSynced
+      .takeWhile(() => !this.destroyed)
+      .subscribe((isFullSynced) => {
+        this.isFullySynced = isFullSynced;
+      });
+  }
 
   ngOnInit() {
     this.settings = this._settingsService.loadSettings();
@@ -83,6 +92,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
     //const walletInfo = this._rpcState.get('getwalletinfo') || {};
     this.onLockedStateChanged(this._rpcState.get('locked'));
+
+    this._rpc.call('listunspent').subscribe(txs => {
+      this.enableCombine = txs.length > 1;
+    });
   }
 
   ngOnDestroy() {
@@ -152,13 +165,13 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   async updateUserInfo(): Promise<void> {
-    let alertMessage = 'Email and username accepted, we will notify you if your nodes go down. Thank you.';
+    let alertMessage = 'Your Email and username has been accepted, we will notify you when and if your nodes go down, Thank you.';
 
     if (this.userInfo.isSubscribed) {
       await this.userInfoService.subscribe();
     } else {
       await this.userInfoService.unsubscribe();
-      alertMessage = 'Email and username accepted, we won\'t notify you if your nodes go down. Thank you.';
+      alertMessage = 'Your user has been removed from the notifications module, we will NO LONGER NOTIFIY you.';
     }
 
     await this.userInfoService.create(this.userInfo.email, this.userInfo.userName);
@@ -184,7 +197,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   restartDaemon(args: Array<string> = []): void {
-    this.flashNotificationService.open('Restarting daemon... Please wait 30 seconds for functionality to be restored to your wallet..');
+    this.flashNotificationService.open('Restarting daemon ... Please wait 30 seconds to use your wallet ...');
     this.daemonService.restart(args)
       .subscribe(() => this.flashNotificationService.open('Daemon successfully restarted.'));
   }
@@ -229,7 +242,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   clearCache() {
-    this.flashNotificationService.open('Clearing cache... Please wait 30 seconds for functionality to be restored to your wallet..');
+    this.flashNotificationService.open('Clearing cache ... Please wait 30 seconds to use your wallet ...');
     this.daemonService.stop().subscribe(() => {
       this._rpc.call('clear-cache').subscribe(() => {
         this.daemonService.restart().subscribe(() => {});
@@ -242,7 +255,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   async onSetup2faClick(): Promise<void> {
-    const isUnlocked = await this._modals.unlock(AuthScopes.SETUP_TFA, { description: 'Please unlock your wallet to begin setting up 2-factor authentication.' });
+    const isUnlocked = await this._modals.unlock(AuthScopes.SETUP_TFA, { description: 'Please unlock your wallet to setup 2-Factor Authentication.' });
 
     if (!isUnlocked) {
       return;
@@ -251,5 +264,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
     const modal = this._modals.open('tfaSettings', { forceOpen: true });
     await (modal.beforeClose().toPromise());
     await this.initUserSettings();
+  }
+
+  async combineUtxos(): Promise<void> {
+    this.enableCombine = !await this._modals.combineUtxo();
   }
 }

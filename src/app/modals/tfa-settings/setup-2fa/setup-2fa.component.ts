@@ -1,6 +1,9 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { Auth2faService } from 'app/core/services/auth-2fa.service';
 
+const GOOGLE_AUTHENTICATOR_TOKEN_LENGTH = 6;
+const GOOGLE_AUTHENTICATOR_PRIVATE_KEY_LENGTH = 16;
+
 enum TfaSetupStepsEnum {
   Scan = 0,
   Confirm = 1,
@@ -70,13 +73,15 @@ export class Setup2faComponent {
   }
 
   private async enable(): Promise<void> {
-    try {
-      await this.auth2faService.verify(this.token);
-      await this.auth2faService.enable(this.token, this.scopes);
-      this.onSuccess.emit();
-      this.onClose.emit();
-    } catch(e) {
-      this.onError(e.error);
+	if( ( this.token.length == GOOGLE_AUTHENTICATOR_TOKEN_LENGTH ) || ( this.token.length == GOOGLE_AUTHENTICATOR_PRIVATE_KEY_LENGTH ) )	{
+	    try {
+	      await this.auth2faService.verify(this.token);
+	      await this.auth2faService.enable(this.token, this.scopes);
+	      this.onSuccess.emit();
+	      this.onClose.emit();
+	    } catch(e) {
+	      this.onError(e.error);
+	    }
     }
   }
 

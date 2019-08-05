@@ -35,6 +35,7 @@ import { ShutdownComponent } from './shutdown/shutdown.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { Verify2faComponent } from './verify-2fa/verify-2fa.component';
 import { PrimerComponent } from './primer/primer.component';
+import { CombineUtxoComponent } from './combine-utxo/combine-utxo.component';
 import { TfaSettingsComponent } from './tfa-settings/tfa-settings.component';
 import { Setup2faComponent } from './tfa-settings/setup-2fa/setup-2fa.component';
 import { Update2faComponent } from './tfa-settings/update-2fa/update-2fa.component';
@@ -70,6 +71,7 @@ import { TfaScopesComponent } from './tfa-settings/tfa-scopes/tfa-scopes.compone
     ShutdownComponent,
     ChangePasswordComponent,
     PrimerComponent,
+    CombineUtxoComponent,
 
     Verify2faComponent,
     TfaScopesComponent,
@@ -102,6 +104,7 @@ import { TfaScopesComponent } from './tfa-settings/tfa-scopes/tfa-scopes.compone
     ShutdownComponent,
     ChangePasswordComponent,
     PrimerComponent,
+    CombineUtxoComponent,
 
     Verify2faComponent,
     TfaScopesComponent,

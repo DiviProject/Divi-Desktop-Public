@@ -22,9 +22,37 @@ export class ReleaseNotesComponent implements OnInit {
   }
 
   private prepareReleaseNotes(): void {
-    this.releaseInfo.releaseNotes = this.replace(this.releaseInfo.releaseNotes, '\r\n', '<br />');
-    // const boldText = ['Bug Fixes', 'Features', 'Changelog'];
-    // boldText.forEach(t => this.releaseInfo.releaseNotes = this.replace(this.releaseInfo.releaseNotes, t, `<b>${t}</b>`));
+    let lines = this.releaseInfo.releaseNotes.split('\n');
+    lines = lines.map(l => this.prepareLine(l)).filter(l => !!l);
+    this.releaseInfo.releaseNotes = lines.join('');
+  }
+
+  private prepareLine(line: string): string {
+    let newLine = this.replace(line, '\r', '').trim();
+
+    if (newLine.indexOf('&nbsp;') === 0) {
+      newLine = newLine.replace('&nbsp;', '');
+    }
+
+    newLine = newLine.trim();
+
+    if (!newLine) {
+      return '';
+    }
+
+    if (newLine.indexOf('##') === 0) {
+      return `<h2>${newLine.replace('##', '').trim()}</h2>`;
+    }
+
+    if (newLine.indexOf('#') === 0) {
+      return `<h1>${newLine.replace('#', '').trim()}</h1>`;
+    }
+
+    if (newLine.indexOf('*') === 0) {
+      return `<li>${newLine.replace('*', '').trim()}</li>`;
+    }
+
+    return newLine;
   }
 
   private replace(str: string, oldValue: string, newValue: string): string {

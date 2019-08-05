@@ -1,10 +1,10 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, OnDestroy } from '@angular/core';
 import { PageEvent } from '@angular/material';
 import { Log } from 'ng2-logger'
 
 import { Transaction } from '../transaction.model';
 import { TransactionsStateService } from '../transactions-state.service';
-import { BlockStatusService, ExportService } from '../../../../core';
+import { BlockStatusService, ExportService, RpcService, RpcStateService } from '../../../../core';
 import { DateFormatter } from 'app/core/util/utils';
 import { ExportField } from 'app/core/models/export-field';
 
@@ -14,8 +14,9 @@ import { ExportField } from 'app/core/models/export-field';
   styleUrls: ['./transaction-table.component.scss']
 })
 
-export class TransactionsTableComponent implements OnInit {
-
+export class TransactionsTableComponent implements OnInit, OnDestroy {
+  private destroyed: boolean = false;
+  public walletInitialized: boolean = true;
   @Input() display: any;
   @ViewChild('paginator') paginator: any;
 
@@ -50,13 +51,22 @@ export class TransactionsTableComponent implements OnInit {
   constructor(
     public txService: TransactionsStateService,
     public blockStatusService: BlockStatusService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private rpcState: RpcStateService
   ) {
   }
 
   ngOnInit(): void {
     this.display = Object.assign({}, this._defaults, this.display); // Set defaults
     this.txService.postConstructor(this.display.txDisplayAmount);
+
+    this.rpcState.observe('ui:walletInitialized')
+    .takeWhile(() => !this.destroyed)
+    .subscribe(status => this.walletInitialized = status);
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed = true;
   }
 
   public sort(fld: string): void {

@@ -5,26 +5,46 @@ import { Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
 import { RpcService, RpcStateService } from '../rpc/rpc.module';
 import { CacheService } from '../cache/cache.service';
+import { LocalStorage } from './local-storage.service';
+import { AppSettingsService } from './app-settings.service';
+import { DaemonService } from '../daemon/daemon.service';
 
 const TRANSACTIONS_CACHE_KEY = "TRANSACTIONS_CACHE";
+const TRANSACTIONS_CACHE_KEY_PER_NETWORK = (net: string) => `TRANSACTIONS_${net}`;
 const TRANSACTIONS_CACHE_EXPIRATION = 60*1;
 const LIST_TRANSACTIONS_DELAY = 5000;
 
 @Injectable()
 export class TransactionsService implements OnDestroy {
   private destroyed: boolean = false;
+  private net: string = null;
   private shareObservable: any = null;
 
   constructor(
     private rpc: RpcService,
     private rpcState: RpcStateService,
-    private cacheService: CacheService
+    private cacheService: CacheService,
+    private localStorage: LocalStorage,
+    private appSettingsService: AppSettingsService,
+    private daemonService: DaemonService
   ) {
     this.rpcState.observe('getwalletinfo', 'txcount')
       .takeWhile(() => !this.destroyed)
       .subscribe(txcount => {
         this.invalidate();
       });
+
+    this.appSettingsService.onNetChangeObs
+      .takeWhile(() => !this.destroyed)
+      .subscribe(net => this.net = net);
+
+    this.daemonService.state
+      .takeWhile(() => !this.destroyed)
+      .subscribe(state => {
+        if (state.isWalletLoading) {
+          this.localStorage.set(TRANSACTIONS_CACHE_KEY_PER_NETWORK(this.net), []);
+        }
+      });    
   }
 
   ngOnDestroy() {
@@ -54,12 +74,17 @@ export class TransactionsService implements OnDestroy {
         });
 
         this.cacheService.set(TRANSACTIONS_CACHE_KEY, transactions, TRANSACTIONS_CACHE_EXPIRATION);
+        const lastTransactions = transactions.concat().sort((a, b) => a.time < b.time ? 1 : -1).slice(0, 1000);
+        this.localStorage.set(TRANSACTIONS_CACHE_KEY_PER_NETWORK(this.net), lastTransactions);
         obs.next(transactions);
         obs.complete();
         setTimeout(_ => this.shareObservable = null, LIST_TRANSACTIONS_DELAY);
       }, err => {
         this.shareObservable = null;
-        obs.error(err);
+        // when daemon not started
+        const transactions = this.localStorage.get(TRANSACTIONS_CACHE_KEY_PER_NETWORK(this.net));
+        obs.next(transactions || []);
+        obs.complete();
       });
     }).pipe(share());
   }

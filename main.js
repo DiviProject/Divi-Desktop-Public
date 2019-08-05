@@ -12,6 +12,8 @@ const packageJson   = require('./package.json');
 const util          = require('./modules/util/util');
 const {autoUpdater} = require("electron-updater");
 
+const DOUBLE_SHUTDOWN_INTERVAL_DELAY = ( 30 * 1000 );	//30 seconds in ms = 30 * 1000
+
 /* correct appName and userData to respect Linux standards */
 if (process.platform === 'linux') {
   app.setName('divi-desktop');
@@ -40,19 +42,6 @@ autoUpdater.autoInstallOnAppQuit = false;
 let mainWindow;
 let tray;
 let mainMenu;
-
-//to make singleton instance
-const isSecondInstance = app.makeSingleInstance((commandLine, workingDirectory) => {
-  // Someone tried to run a second instance, we should focus our window.
-  if (mainWindow) {
-    if (mainWindow.isMinimized()) mainWindow.show();
-    mainWindow.focus()
-  }
-});
-if (isSecondInstance) {
-  app.quit();
-  return;
-}
 
 if (!fs.existsSync(roamingDtPath)) {
   util.createMissingFolder(roamingDtPath);
@@ -110,6 +99,7 @@ autoUpdater.on('update-downloaded', (info) => {
 app.on('window-all-closed', function () {
   log.info("window-all-closed");
   app.isQuiting = true;
+  setInterval( app.quit, DOUBLE_SHUTDOWN_INTERVAL_DELAY );
   app.quit();
 
   tray = null;
@@ -152,10 +142,14 @@ function initMainWindow() {
     icon: path.join(__dirname, 'resources/icon.png'),
     transparent: false,
 
+    frame: true,
+
     webPreferences: {
+      backgroundThrottling: false,
+      webviewTag: false,
       nodeIntegration: false,
       sandbox: true,
-      contextIsolation: true,
+      contextIsolation: false,
       preload: path.join(__dirname, 'preload.js'),
       webSecurity: false
     },
@@ -197,8 +191,25 @@ function initMainWindow() {
     mainWindow = null
   });
 
+  function close() {
+    mainWindow.webContents.send('app-event', 'shutdown');
+
+    app.isDaemonStopping = true;
+
+    init.stop().then(() => {
+      app.isQuiting = true;
+
+      if (mainWindow) {
+        mainWindow.close();
+      }
+      setInterval( app.quit, DOUBLE_SHUTDOWN_INTERVAL_DELAY );
+      app.quit();
+    });
+  }
+
   mainWindow.on('close', (event) => {
     if (app.isQuiting) {
+      setInterval( app.quit, DOUBLE_SHUTDOWN_INTERVAL_DELAY );
       app.quit();
       return;
     }
@@ -206,27 +217,23 @@ function initMainWindow() {
     event.preventDefault();
 
     if(!app.isQuiting && !app.isDaemonStopping){
+
+      var isMac = process.platform === 'darwin';
+      if (isMac) { // skip confirmation
+        return close();
+      }
+
       dialog.showMessageBox({
         cancelId: -1,
         type: 'question',
-        buttons: ['Minimize', 'Exit'],
+        buttons: ['Cancel', 'Minimize (Hide app)', 'Exit (Closing app)'],
         title: 'Confirm',
         icon: path.join(__dirname, 'resources/icon.png'),
-        message: 'Do you want to minimize or exit the app?'
+        message: 'How would you like to close Divi?'
       }, function (response) {
-        if (response === 1) { // Exit
-          mainWindow.webContents.send('app-event', 'shutdown');
-          app.isDaemonStopping = true;
-
-          init.stop().then(() => {
-            app.isQuiting = true;
-
-            if (mainWindow) {
-              mainWindow.close();
-            }
-            app.quit();
-          });
-        } else if (response === 0 ) { // Minimize
+        if (response === 2) { // Exit
+          close();
+        } else if (response === 1 ) { // Minimize
           if (platform === 'linux') {
             mainWindow.minimize();
           } else {
@@ -253,7 +260,8 @@ function makeMainMenu() {
     submenu: [
         { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
         { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
-        { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+        { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" },
+        { label: "Quit", accelerator: "CmdOrCtrl+Q", selector: "quit:", click: () => mainWindow.close() }
     ]}
   ];
 
@@ -339,6 +347,7 @@ function makeTray() {
       click() {
           mainWindow.hide();
           app.isQuiting = true;
+          setInterval( app.quit, DOUBLE_SHUTDOWN_INTERVAL_DELAY );
           app.quit();
       }
     }

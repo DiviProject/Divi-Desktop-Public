@@ -3,7 +3,7 @@ import { Log } from 'ng2-logger'
 import * as _ from 'lodash'
 import { Transaction } from './transaction.model';
 
-import { RpcService, RpcStateService, BlockStatusService, CacheService, TransactionsService } from '../../../core';
+import { RpcService, RpcStateService, BlockStatusService, CacheService, TransactionsService, AppSettingsService } from '../../../core';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -44,7 +44,8 @@ export class TransactionsStateService implements OnDestroy {
   constructor(
     private rpcState: RpcStateService,
     private blockStatusService: BlockStatusService,
-    private transactionsService: TransactionsService
+    private transactionsService: TransactionsService,
+    private appSettingsService: AppSettingsService
   ) {
     this.syncSub = this.blockStatusService.isFullSynced.subscribe(_ => {
       if (!!this.syncSub) {
@@ -97,6 +98,19 @@ export class TransactionsStateService implements OnDestroy {
         this.loadTransactions();
       });
 
+    this.rpcState.observe('ui:walletInitialized')
+      .takeWhile(() => !this.destroyed)
+      .distinctUntilChanged()
+      .subscribe(status => {
+        if (!status) {
+          return;
+        }
+        this.loadTransactions();
+      });
+
+      this.appSettingsService.onNetChangeObs
+        .takeWhile(() => !this.destroyed)
+        .subscribe(_ => this.loadTransactions());
 
     /* check if testnet -> block explorer url */
     this.rpcState.observe('getblockchaininfo', 'chain').take(1)

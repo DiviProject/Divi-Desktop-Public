@@ -8,6 +8,7 @@ import { RpcService } from '../../../core/rpc/rpc.service';
 import { RpcStateService } from '../../../core/rpc/rpc-state/rpc-state.service';
 
 import { SendService } from './send.service';
+import { SettingsService } from '../../../core/services/settings.service';
 import { SnackbarService } from '../../../core/snackbar/snackbar.service';
 
 import { AddressLookupComponent } from '../addresslookup/addresslookup.component';
@@ -60,7 +61,8 @@ export class SendComponent implements OnInit {
     private flashNotification: SnackbarService,
     private balanceService: BalanceService,
     private diviService: DiviService,
-    private blockStatusService: BlockStatusService
+    private blockStatusService: BlockStatusService,
+    private settingsService: SettingsService
   ) {
     this.progress = 50;
     this.addressHelper = new AddressHelper();
@@ -221,8 +223,12 @@ export class SendComponent implements OnInit {
 
   async onSubmit(): Promise<void> {
     const isUnlocked = await this._modals.unlock(AuthScopes.SEND);
+    const settings = this.settingsService.loadSettings();
 
     if (isUnlocked) {
+      if (!!settings.combineUtxo.onSend && this.enableCombine) {    
+        this.enableCombine = !await this._modals.combineUtxo();
+      }
       this.openSendConfirmationModal();
     }
   }

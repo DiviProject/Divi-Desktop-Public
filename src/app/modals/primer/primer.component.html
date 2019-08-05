@@ -27,7 +27,7 @@
         <button mat-raised-button 
                 color="primary" 
                 (click)="retry()"
-                *ngIf="dialogRef.componentInstance.enableClose && isErrorOccurred">
+                *ngIf="(dialogRef.componentInstance.enableClose && isErrorOccurred) || enableAbandon">
           Retry
         </button>
         <button mat-raised-button 

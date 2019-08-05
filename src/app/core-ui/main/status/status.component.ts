@@ -9,6 +9,7 @@ import { RpcService, RpcStateService } from '../../../core';
 
 import { ConsoleModalComponent } from './modal/help-modal/console-modal.component';
 import { AuthScopes } from 'app/core/models/auth-scopes.enum';
+import { BlockStatusService } from 'app/core/rpc/rpc.module';
 
 
 @Component({
@@ -19,10 +20,14 @@ import { AuthScopes } from 'app/core/models/auth-scopes.enum';
 export class StatusComponent implements OnInit, OnDestroy {
 
   peerListCount: number = 0;
+  public walletInitialized: boolean;
   public coldStakingStatus: boolean;
   public stakingEnabled: boolean;
+  public stakingDescription: string;
+  public isUnlockedForStaking: boolean = false;
   public encryptionStatus: string = null;
   public encryptionStatusIcon: string = null;
+  private stakinginfo: any = null;
   private _sub: Subscription;
   private destroyed: boolean = false;
 
@@ -30,6 +35,7 @@ export class StatusComponent implements OnInit, OnDestroy {
 
 
   constructor(
+    public blockStatusService: BlockStatusService,
     private _rpc: RpcService,
     private _rpcState: RpcStateService,
     private _modalsService: ModalsService,
@@ -49,14 +55,24 @@ export class StatusComponent implements OnInit, OnDestroy {
       .subscribe(encryptionstatus => {
         this.encryptionStatus = encryptionstatus;
         this.encryptionStatusIcon = this.getIconEncryption(this.encryptionStatus);
+        this.isUnlockedForStaking = ['Unlocked, staking only', 'Unlocked', 'Unencrypted'].includes(this.encryptionStatus);
       });
 
     this._rpcState.observe('getstakinginfo')
       .takeWhile(() => !this.destroyed)
       .subscribe(status => {
-        const props = Object.keys(status);
-        this.stakingEnabled = props.filter(p => !!status[p]).length === props.length;
+        this.stakinginfo = status;
+        this.stakingEnabled = false;
+        if (!!this.stakinginfo) {
+          const props = Object.keys(this.stakinginfo);
+          this.stakingEnabled = props.filter(p => !!status[p]).length === props.length;
+          this.stakingDescription = props.filter(p => !status[p]).map(p => `${p}: false`).join(', ');
+        }
       });
+
+    this._rpcState.observe('ui:walletInitialized')
+      .takeWhile(() => !this.destroyed)
+      .subscribe(status => this.walletInitialized = status);
   }
 
   ngOnDestroy() {

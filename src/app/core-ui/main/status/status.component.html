@@ -1,5 +1,13 @@
 <div class="status-icon disable-select">
 
+  <span *ngIf="!(blockStatusService.isFullSynced | async) || !walletInitialized"
+    class="sync icon"
+    matTooltip="Getting latest wallet info."
+    container="body"
+    matTooltipPosition="below">
+      <img class="step-spinner" src="assets/img/masternode/spinner.gif" />
+  </span>
+
   <span class="status icon" matTooltip="Peers: {{ peerListCount }}">
     <img src="assets/icons/SVG/network/peers-{{ getIconNumber() }}.svg"/>
   </span>
@@ -13,11 +21,11 @@
     (click)="toggle()">
       <img src="assets/icons/SVG/{{ encryptionStatusIcon }}.svg"/>
   </span>
-
+  
   <span 
     class="staking icon"
-    [matTooltip]="stakingEnabled ? 'Staking enabled' : 'Staking disabled'"
-    [ngClass]="{'enabled': stakingEnabled, 'disabled': !stakingEnabled}"
+    [matTooltip]="stakingEnabled && isUnlockedForStaking ? 'Staking enabled' : (!isUnlockedForStaking ? 'Staking disabled' : stakingDescription)"
+    [ngClass]="{'enabled': stakingEnabled && isUnlockedForStaking, 'disabled': !isUnlockedForStaking, 'unlocked': isUnlockedForStaking && !stakingEnabled}"
     container="body"
     matTooltipPosition="below">
       <img src="assets/icons/SVG/staking_icon.svg"/>

@@ -18,13 +18,14 @@ import { NewTxNotifierService } from './services/new-tx-notifier.service';
 import { TransactionsService } from './services/transactions.service';
 import { InvocationService } from './services/invocation.service';
 import { ExportService } from './services/export.service';
-import { SecutiyService } from './services/security.service';
+import { SecurityService } from './services/security.service';
 import { AppSettingsService } from './services/app-settings.service';
 import { Auth2faService } from './services/auth-2fa.service';
 import { UserInfoService } from './services/user-info.service';
 import { UserSettingsService } from './services/user-settings.service';
 import { PrimerService } from './services/primer.service';
 import { SettingsService } from './services/settings.service';
+import { LocalStorage } from './services/local-storage.service';
 
   /*
     Loading the core library will intialize IPC & RPC
@@ -60,8 +61,9 @@ export class CoreModule {
         TransactionsService,
         InvocationService,
         ExportService,
-        SecutiyService,
+        SecurityService,
         AppSettingsService,
+        LocalStorage,
 
         Auth2faService,
         UserInfoService,

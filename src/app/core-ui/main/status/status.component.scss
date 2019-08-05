@@ -13,10 +13,17 @@
     cursor: pointer;
   }
 
+  &.sync {
+    img {
+      height: 16px;
+    }
+  }
+
   // Staking icon
   &.staking {
     img {
       width: 14px;
+      filter: invert(.5) sepia(1) saturate(90) hue-rotate(0deg);
     }
     &.enabled {
       img {
@@ -26,6 +33,12 @@
     &.disabled {
       img {
         filter: invert(.5) sepia(1) saturate(90) hue-rotate(0deg);
+      }
+    }
+
+    &.unlocked {
+      img {
+        filter: invert(0.8) sepia(0.5) saturate(90) hue-rotate(0deg);
       }
     }
   }
