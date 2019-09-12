@@ -4,7 +4,10 @@
       <span class="point big" *ngIf="mode === 'full'">{{amount.dot()}}</span>
       <span class="number small" *ngIf="mode === 'full'">{{amount.getFractionalPart() || ''}}</span>
     
-      <p class="description" *ngIf="diviPrices">${{amount.getAmount() * diviPrices.usd | number:'1.0-2' }}</p>
+      <ng-container *ngFor="let s of exchangeSettings">
+        <p class="exchange" *ngIf="!!diviPrices && !!diviPrices[s.value]">${{amount.getAmount() * diviPrices[s.value].usd | number:'1.0-2' }} ({{s.name}})</p>
+      </ng-container>
+
       <p class="description"><span [matTooltip]="tooltip">{{type}}</span></p>
   </div>
 </div>

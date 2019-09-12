@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { Auth2faService } from 'app/core/services/auth-2fa.service';
+import { SnackbarService } from 'app/core';
 
 const GOOGLE_AUTHENTICATOR_TOKEN_LENGTH = 6;
 const GOOGLE_AUTHENTICATOR_PRIVATE_KEY_LENGTH = 16;
@@ -30,7 +31,9 @@ export class Setup2faComponent {
   @Output() public onSuccess: EventEmitter<void> = new EventEmitter<void>();
   @Output() public onClose: EventEmitter<void> = new EventEmitter<void>();
 
-  constructor(private auth2faService: Auth2faService) {
+  constructor(
+    private auth2faService: Auth2faService,
+    private flashNotification: SnackbarService) {
   }
 
   async ngOnInit() {
@@ -52,6 +55,10 @@ export class Setup2faComponent {
 
     this.token = null;
     this.error = null;
+  }
+
+  public copyToClipBoard(): void {
+    this.flashNotification.open('Manual Code copied to clipboard.', '');
   }
 
   public async onBackClick(): Promise<void> {

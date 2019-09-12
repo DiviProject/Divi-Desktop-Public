@@ -5,6 +5,7 @@ const ipc           = require('./ipc/ipc');
 const rpc           = require('./rpc/rpc');
 const zmq           = require('./zmq/zmq');
 const primer        = require('./primer/primer');
+const modeManager   = require('./mode-manager/mode-manager');
 
 const daemon        = require('./daemon/daemon');
 const daemonManager = require('./daemon/daemonManager');
@@ -12,9 +13,9 @@ const multiwallet   = require('./multiwallet');
 const notification  = require('./notification/notification');
 
 const UPDATE_MESSAGE_RE_SHOW_ALERT_TIME = ( 1 * 60 * 60 * 1000 );		//1 hour * 60 minutes * 60 seconds * 1000 milliseconds
-let updatesFailedMessage = false;
+let updatesFailedMessage				= false;
 
-let attemptsCount = 10;
+let attemptsCount						= 10;
 
 exports.start = function (mainWindow) {
 
@@ -26,6 +27,7 @@ exports.start = function (mainWindow) {
   zmq.init(mainWindow);
   // zmq.test(); // loop, will send tests
   primer.init(mainWindow);
+  modeManager.init(mainWindow);
 
   exports.startDaemonManager();
 }

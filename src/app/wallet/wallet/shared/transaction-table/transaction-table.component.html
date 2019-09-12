@@ -1,4 +1,16 @@
 <mat-progress-bar mode="indeterminate" *ngIf="!(blockStatusService.isFullSynced | async) || !walletInitialized"></mat-progress-bar>
+
+<app-paginator
+  #paginator
+  *ngIf="display.pagination && (display.paginationPosition && display.paginationPosition.indexOf('top') >= 0) && txService.txs.length > 0"
+  [length]="txService.txCount"
+  class="top"
+  [pageIndex]="txService.currentPage"
+  [pageSize]="txService.MAX_TXS_PER_PAGE"
+  [pageSizeOptions]="txService.PAGE_SIZE_OPTIONS"
+  (onChange)="pageChanged($event)">
+</app-paginator>
+
 <div class="no-results" *ngIf="txService.txs.length === 0 && (blockStatusService.isFullSynced | async)">
   No transactions yet
 </div>
@@ -9,7 +21,7 @@
     <mat-panel-title fxFlex="0 0 137px" fxFlex.lt-md="100" *ngIf="display.date" (click)="sort('blocktime')">
       <span>Time</span>
       <span class="mat-expansion-indicator"
-            [ngClass]="{'asc': txService.filters.sortDirection === 'asc', 'desc': txService.filters.sortDirection === 'desc'}" 
+            [ngClass]="{'asc': txService.filters.sortDirection === 'asc', 'desc': txService.filters.sortDirection === 'desc'}"
             *ngIf="txService.filters.sort === 'blocktime'"></span>
     </mat-panel-title>
 
@@ -21,15 +33,15 @@
     <mat-panel-title fxFlex="1 0 175px" fxFlex.lt-md="100" *ngIf="display.category" (click)="sort('category')">
       <span>Category</span>
       <span class="mat-expansion-indicator"
-            [ngClass]="{'asc': txService.filters.sortDirection === 'asc', 'desc': txService.filters.sortDirection === 'desc'}" 
+            [ngClass]="{'asc': txService.filters.sortDirection === 'asc', 'desc': txService.filters.sortDirection === 'desc'}"
             *ngIf="txService.filters.sort === 'category'"></span>
     </mat-panel-title>
 
     <!-- Amount -->
     <mat-panel-title fxFlex="1 0 155px" fxFlex.lt-md="100" *ngIf="display.amount" class="history_amount" (click)="sort('amount')">
         <span>Amount</span>
-        <span class="mat-expansion-indicator" 
-              [ngClass]="{'asc': txService.filters.sortDirection === 'asc', 'desc': txService.filters.sortDirection === 'desc'}" 
+        <span class="mat-expansion-indicator"
+              [ngClass]="{'asc': txService.filters.sortDirection === 'asc', 'desc': txService.filters.sortDirection === 'desc'}"
               *ngIf="txService.filters.sort === 'amount'"></span>
     </mat-panel-title>
 
@@ -43,7 +55,7 @@
       <mat-panel-title fxFlex="0 0 5px" fxFlex.lt-md="100" class="history_actions">
         <img src="assets/img/dots.png"/>
       </mat-panel-title>
-      
+
       <!-- Date -->
       <mat-panel-title fxFlex="0 0 140px" fxFlex.lt-md="100" *ngIf="display.date" class="history_date" matTooltip="The time and date the transaction occurred">
         {{ (tx.displayInfo.date | date:'HH:mm, d MMM yyyy').toUpperCase() }}
@@ -52,7 +64,7 @@
       <!-- Currency icon -->
       <mat-panel-title fxFlex="1 0 35px" fxFlex.lt-md="100" *ngIf="display.currency" class="history_cur_icon">
         <div class="currency">
-          <img src="assets/img/logo-white.png"/>
+          <img src="assets/img/logo-black.png"/>
         </div>
       </mat-panel-title>
 
@@ -60,16 +72,19 @@
       <mat-panel-title fxFlex="1 0 15px" fxFlex.lt-md="100" *ngIf="display.category" class="history_cat_icon"
                         [ngSwitch]="tx.category">
         <span *ngSwitchCase="'stake_reward'" class="tx-type staked">
-          <mat-icon fontSet="partIcon" fontIcon="part-arrow-right" matTooltip="Incoming transaction"></mat-icon>
+          <mat-icon fontSet="partIcon" fontIcon="part-arrow-right" matTooltip="Staked"></mat-icon>
         </span>
         <span *ngSwitchCase="'receive'" class="tx-type receive">
-          <mat-icon fontSet="partIcon" fontIcon="part-arrow-right" matTooltip="Incoming transaction"></mat-icon>
+          <mat-icon fontSet="partIcon" fontIcon="part-arrow-right" matTooltip="Received"></mat-icon>
         </span>
         <span *ngSwitchCase="'send'" class="tx-type send">
-            <mat-icon fontSet="partIcon" fontIcon="part-arrow-left"></mat-icon>
+            <mat-icon fontSet="partIcon" fontIcon="part-arrow-left" matTooltip="Sent"></mat-icon>
+        </span>
+        <span *ngSwitchCase="'allocated'" class="tx-type allocated">
+          <img src="assets/icons/SVG/allocated.svg" matTooltip="Allocated"/>
         </span>
         <span *ngSwitchCase="'move'" class="tx-type moved">
-          <img src="assets/icons/SVG/move.svg"/>
+          <img src="assets/icons/SVG/move.svg" matTooltip="Moved"/>
         </span>
       </mat-panel-title>
 
@@ -93,7 +108,9 @@
       <!-- Status -->
       <mat-panel-title fxFlex="1 0 120px" fxFlex.lt-md="100" *ngIf="display.amount" class="history_confirmation">
         <span class="confirm {{tx.confirmationInfo.style}}" [matTooltip]="tx.confirmationInfo.tooltip">
-          {{ tx.confirmationInfo.label }} <mat-icon fontSet="partIcon" [fontIcon]="tx.confirmationInfo.icon"></mat-icon>
+          {{ tx.confirmationInfo.label }}
+          <mat-icon fontSet="partIcon" [fontIcon]="tx.confirmationInfo.icon" *ngIf="tx.confirmationInfo.label !== 'spendable'"></mat-icon>
+          <img class="double-tick" *ngIf="tx.confirmationInfo.label === 'spendable'" src="assets/icons/SVG/double-tick.png" />
         </span>
       </mat-panel-title>
     </mat-expansion-panel-header>
@@ -136,9 +153,11 @@
 
 <app-paginator
   #paginator
-  *ngIf="display.pagination && txService.txs.length > 0"
+  *ngIf="display.pagination && (display.paginationPosition && display.paginationPosition.indexOf('bottom') >= 0) && txService.txs.length > 0"
   [length]="txService.txCount"
+  [pageIndex]="txService.currentPage"
   [pageSize]="txService.MAX_TXS_PER_PAGE"
+  class="bottom"
   [pageSizeOptions]="txService.PAGE_SIZE_OPTIONS"
-  (page)="pageChanged($event)">
+  (onChange)="pageChanged($event)">
 </app-paginator>

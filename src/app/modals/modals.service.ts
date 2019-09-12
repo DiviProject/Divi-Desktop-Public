@@ -1,12 +1,10 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Log } from 'ng2-logger';
 
-import { RpcStateService, UpdateService, SecurityService, RpcService } from '../core';
+import { RpcStateService, UpdateService, SecurityService, RpcService, SettingsService } from '../core';
 
 /* modals */
 import { CreateWalletComponent } from './createwallet/createwallet.component';
-import { ColdstakeComponent } from './coldstake/coldstake.component';
-import { DaemonComponent } from './daemon/daemon.component';
 import { SyncingComponent } from './syncing/syncing.component';
 import { UnlockwalletComponent } from './unlockwallet/unlockwallet.component';
 import { EncryptwalletComponent } from './encryptwallet/encryptwallet.component';
@@ -22,6 +20,7 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
 import { Verify2faComponent } from './verify-2fa/verify-2fa.component';
 import { PrimerComponent } from './primer/primer.component';
 import { CombineUtxoComponent } from './combine-utxo/combine-utxo.component';
+import { UninstallComponent } from './uninstall/uninstall.component';
 import { TfaSettingsComponent } from './tfa-settings/tfa-settings.component';
 import { AuthScopes } from 'app/core/models/auth-scopes.enum';
 
@@ -40,8 +39,6 @@ export class ModalsService implements OnDestroy {
 
   messages: Object = {
     createWallet: CreateWalletComponent,
-    coldStake: ColdstakeComponent,
-    daemon: DaemonComponent,
     syncing: SyncingComponent,
     unlock: UnlockwalletComponent,
     encrypt: EncryptwalletComponent,
@@ -54,6 +51,7 @@ export class ModalsService implements OnDestroy {
     verify2fa: Verify2faComponent,
     primer: PrimerComponent,
     combineUtxo: CombineUtxoComponent,
+    uninstall: UninstallComponent,
     tfaSettings: TfaSettingsComponent
   };
 
@@ -62,7 +60,8 @@ export class ModalsService implements OnDestroy {
     private _rpcState: RpcStateService,
     private _dialog: MatDialog,
     private _updateService: UpdateService,
-    private _securityService: SecurityService
+    private _securityService: SecurityService,
+    private _settingsService: SettingsService
   ) {
 
     this.subscribeOnWalletInit();
@@ -105,6 +104,11 @@ export class ModalsService implements OnDestroy {
     * @param {any} data       Optional - data to pass through to the modal.
     */
   open(modal: string, data?: any): MatDialogRef<ModalsComponent> {
+    const settings = this._settingsService.loadSettings();
+    if (!!settings.main.minimode) {
+      return;
+    }
+
     if (!this.canAccess(modal, data)) {
       return;
     }
@@ -266,7 +270,7 @@ export class ModalsService implements OnDestroy {
           await onFail();
           return false;
         }
-      } 
+      }
 
       return true;
     } catch(e) {
@@ -276,15 +280,24 @@ export class ModalsService implements OnDestroy {
     }
   }
 
-  async unlock(scope: string, data?: any, showStakeOnly?: boolean): Promise<boolean> {
+  async unlock(scope: string, data?: any, showStakeOnly?: boolean, stakeOnly?: boolean): Promise<boolean> {
     const isUnlocked = this._securityService.isUnlocked();
+    let isUnlockedForStaking = this._securityService.isUnlockedForStaking();
 
-    if (!isUnlocked) {
+    if (isUnlocked) {
+      isUnlockedForStaking = true;
+    }
+
+    if (!isUnlocked || !isUnlockedForStaking) {
       //unlock
-      const modal = this.open('unlock', { data, forceOpen: true, showStakeOnly, timeout: 30 });
+      const modal = this.open('unlock', { data, forceOpen: true, showStakeOnly, stakeOnly, timeout: 30 });
       await (modal.afterClosed().toPromise());
-      if (this._securityService.isUnlocked()) {
-        this._rpcState.stateCall('getwalletinfo');
+      if (this._securityService.isUnlocked() || this._securityService.isUnlockedForStaking()) {
+        await this._securityService.refresh();
+
+        if (scope === AuthScopes.STAKING) {
+          return this._securityService.isUnlockedForStaking();
+        }
       } else {
         return false;
       }
@@ -302,7 +315,7 @@ export class ModalsService implements OnDestroy {
       const modal = this.open('unlock', { data: { alwaysUnlocked: true }, forceOpen: true, showStakeOnly, timeout: 30 });
       await (modal.afterClosed().toPromise());
       if (this._securityService.isAlwaysUnlocked()) {
-        this._rpcState.stateCall('getwalletinfo');
+        await this._securityService.refresh();
       } else {
         return false;
       }

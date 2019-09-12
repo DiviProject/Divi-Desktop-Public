@@ -5,8 +5,8 @@
       <div class="version">Divi Desktop Version {{releaseInfo.version}}</div>
       <div class="release-notes" [innerHTML]="releaseInfo.releaseNotes"></div>
       <div class="actions">
-        <button mat-raised-button 
-                color="primary" 
+        <button mat-raised-button
+                color="primary"
                 (click)="close()"
                 *ngIf="dialogRef.componentInstance.enableClose">
           Close

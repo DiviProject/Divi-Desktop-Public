@@ -12,7 +12,9 @@ import { ModalsService } from '../../../../modals/modals.service';
 import { QrCodeModalComponent} from '../qr-code-modal/qr-code-modal.component';
 import { DeleteConfirmationModalComponent } from '../../../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 import { SignatureAddressModalComponent } from '../signature-address-modal/signature-address-modal.component';
+import { SettingsService } from '../../../../core/services/settings.service';
 import { AuthScopes } from 'app/core/models/auth-scopes.enum';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'address-table',
@@ -53,8 +55,8 @@ export class AddressTableComponent implements OnInit, OnChanges {
   };
   // Pagination
   currentPage: number = 1;
-  @Input() addressDisplayAmount: number = 5;
-  PAGE_SIZE_OPTIONS: Array<number> = [5, 10, 20];
+  @Input() addressDisplayAmount: number = 25;
+  PAGE_SIZE_OPTIONS: Array<number> = [10, 25, 50, 100, 250];
 
   log: any = Log.create('address-table.component');
 
@@ -64,7 +66,9 @@ export class AddressTableComponent implements OnInit, OnChanges {
     private _rpcState: RpcStateService,
     public dialog: MatDialog,
     public flashNotification: SnackbarService,
-    private _modals: ModalsService
+    private _modals: ModalsService,
+    private settingsService: SettingsService,
+    private router: Router
   ) {
     this._addressService._addresses.subscribe((addresses) => {
       this.addresses = addresses
@@ -72,6 +76,9 @@ export class AddressTableComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    const settings = this.settingsService.loadSettings();
+
+    this.addressDisplayAmount = Number(settings.display.rows);
     this._addressService.getAddresses();
   }
 
@@ -130,6 +137,10 @@ export class AddressTableComponent implements OnInit, OnChanges {
     } else {
       return this.getFilterSubset().length;
     }
+  }
+
+  public onSendClick(address: string): void {
+    this.router.navigate(['/wallet/send', address]);
   }
 
   public getMaxAddressesPerPage(): number {

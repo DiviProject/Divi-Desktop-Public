@@ -1,0 +1,4 @@
+CREATING UNINSTALL CROSSPLATFORM BINARIES
+
+1. npm install pkg -g
+2. pkg uninstall.js

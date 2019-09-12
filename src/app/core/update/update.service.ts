@@ -4,12 +4,15 @@ import { BehaviorSubject } from "rxjs/BehaviorSubject";
 import { RpcService, RpcStateService } from '../rpc/rpc.module';
 import { environment } from 'environments/environment';
 import { DaemonService } from '../daemon/daemon.service';
+import { Log } from 'ng2-logger';
 
 const RELEASE_KEY = "release";
 
 @Injectable()
 export class UpdateService implements OnDestroy {
   public historyLogs: Array<string> = [];
+
+  private log: any = Log.create('update.service');
 
   public isInProgressSub: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public isUpdateAvailableSub: BehaviorSubject<boolean> = new BehaviorSubject(false);
@@ -83,14 +86,14 @@ export class UpdateService implements OnDestroy {
   public update(): void {
     this.historyLogs.push(`Downloaded: 0%...`);
     this.isInProgressSub.next(true);
-    this._rpc.call('download-update').subscribe(_ => {});
+    this._rpc.call('download-update').subscribe(_ => {}, err => this.log.er('update:', err));
   }
 
   private check(timeout?: number): void {
     clearTimeout(this.checkUpdateTimeout);
 
     this.checkUpdateTimeout = setTimeout(() => {
-      this._rpc.call('check-update').subscribe(_ => {});
+      this._rpc.call('check-update').subscribe(_ => {}, err => this.log.er('check:', err));
     }, timeout || this.checkUpdateTimeoutInterval);
   }
 
@@ -99,7 +102,7 @@ export class UpdateService implements OnDestroy {
 
     this.daemonService.stop().subscribe(_ => {
       this.installUpdate();
-    });
+    }, err => this.log.er('install:', err));
   }
 
   private installUpdate(): void {

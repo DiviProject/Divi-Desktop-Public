@@ -1,0 +1,54 @@
+QUOTES = [
+  {
+    "quote": "Think MOCCI, eat mochi",
+    "author": "Boss"
+  },
+  {
+    "quote": "Mocci are a delight to all, but MOCCI is a delight to install!",
+    "author": "shandor"
+  },
+  {
+    "quote": "The Journey to a thousand Divi begins with one click",
+    "author": "Warrior King"
+  },
+  {
+    "quote": "Gold and Silver is the currency of the past, Fiat is the currency of the Banks & Governments, Divi is the currency of the People",
+    "author": "confucius"
+  },
+  {
+    "quote": "Crypto is the Future Gold and Silver",
+    "author": "confucius"
+  },
+  {
+    "quote": "First came Gold & Silver, then Fiat, then Crypto",
+    "author": "confucius"
+  },
+  {
+    "quote": "In Crypto we Trust",
+    "author": "confucius"
+  },
+  {
+    "quote": "Never doubt that a small group of thoughtful, committed citizens can change the world; indeed, it’s the only thing that ever has.",
+    "author": "Margaret Mead"
+  },
+  {
+    "quote": "Get busy staking or get busy winning lottery’s.",
+    "author": "Sigma"
+  },
+  {
+    "quote": "Let us always meet each other with Divi, for Divi is the beginning of love.",
+    "author": "Sigma"
+  },
+  {
+    "quote": "To Divi, or not to Divi, that is the question",
+    "author": "Sigma"
+  },
+  {
+    "quote": "If you want to be happy, Divi.",
+    "author": "Jesus"
+  },
+  {
+    "quote": "The people who are crazy enough to think they can change the World are the ones who do.",
+    "author": "Steve Jobs"
+  }
+]

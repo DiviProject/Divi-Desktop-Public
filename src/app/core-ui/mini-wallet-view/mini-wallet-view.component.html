@@ -1,0 +1,85 @@
+<mat-sidenav-container fullscreen>
+  <div class="mini-mode text-center" *ngIf="walletInited" fullscreen>
+    <div class="mini-section">
+      <h2>Wallet Info</h2>
+      <table>
+        <tr>
+          <td>Peers:</td>
+          <td>{{peersCount}}</td>
+        </tr>
+        <tr>
+          <td>Encryption Status:</td>
+          <td>{{encryptionStatus}}</td>
+        </tr>
+        <tr>
+          <td>Staking Status:</td>
+          <td>{{stakingDescription}}</td>
+        </tr>
+      </table>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="mini-section">
+      <h2>Balances</h2>
+
+      <table *ngIf="blockStatusService.isFullSynced | async">
+        <tr>
+          <td>Total:</td>
+          <td>{{balance.total}}</td>
+        </tr>
+        <tr>
+          <td>Spendable:</td>
+          <td>{{balance.spendable}}</td>
+        </tr>
+      </table>
+
+      <span *ngIf="!(blockStatusService.isFullSynced | async)">Loading Balances...</span>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <ng-container *ngIf="txService.txs && txService.txs.length">
+      <div class="mini-section">
+        <h2>Recent Transactions</h2>
+
+        <table>
+          <tr *ngFor="let tx of txService.txs">
+            <td [ngSwitch]="tx.category">
+              <span *ngSwitchCase="'stake_reward'" class="description">
+                Staked:
+              </span>
+              <span *ngSwitchCase="'mn_reward'" class="description">
+                Reward:
+              </span>
+              <span *ngSwitchCase="'lottery'" class="description">
+                Lottery:
+              </span>
+              <span *ngSwitchCase="'receive'" class="description">
+                Received:
+              </span>
+              <span *ngSwitchCase="'send'" class="description">
+                Sent:
+              </span>
+              <span *ngSwitchCase="'allocated'" class="description">
+                Allocated:
+              </span>
+              <span *ngSwitchCase="'move'" class="description">
+                Moved:
+              </span>
+            </td>
+            <td class="text">{{tx.displayInfo.amount}} DIVI</td>
+          </tr>
+        </table>
+      </div>
+      <mat-divider></mat-divider>
+    </ng-container>
+  </div>
+
+  <div *ngIf="!walletInited" class="loading-wallet text-center">
+    <img src="assets/divi-logo-only.svg">
+    <h2>Loading Wallet...</h2>
+  </div>
+
+  <button class="button" (click)="onExitClick()">Return to Normal Mode</button>
+</mat-sidenav-container>

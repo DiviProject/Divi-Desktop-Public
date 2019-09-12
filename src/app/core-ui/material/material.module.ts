@@ -9,8 +9,11 @@ import {
   MatSidenavModule,
   MatSnackBarModule, MatTabsModule, MatToolbarModule, MatRadioModule, MatInputModule,
   MatTooltipModule,
-  MatSelectModule, MatPaginatorModule, MatProgressSpinnerModule, MatDialogModule
+  MatSelectModule, MatPaginatorModule, MatProgressSpinnerModule, MatDialogModule,
+  MatAutocompleteModule, MatDatepickerModule, MatNativeDateModule
 } from '@angular/material';
+
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 import {A11yModule} from '@angular/cdk/a11y';
 
@@ -45,7 +48,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     MatSelectModule,
     MatInputModule,
     MatPaginatorModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatSlideToggleModule,
+    MatAutocompleteModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   exports: [
     FlexLayoutModule, /* Flex layout here too */
@@ -71,7 +78,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     MatInputModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSlideToggleModule,
+    MatAutocompleteModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   declarations: []
 })

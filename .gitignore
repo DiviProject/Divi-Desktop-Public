@@ -1,8 +1,10 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 .DS_Store
+._.DS_Store
 clean.sh
 divi-backup.tgz
 divi.conf.bu
+package-lock.json
 
 # compiled output
 /dist
@@ -27,6 +29,9 @@ divi.conf.bu
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# IDE - VS
+/.vs
 
 # misc
 /.sass-cache

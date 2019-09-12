@@ -25,10 +25,19 @@
       font-size: 15px;
     }
   }
+
+  & > .exchange,
   & > .description {
     @extend %disable-select;
     color: $text-muted;
-    text-transform: uppercase;
     margin-top: 6px;
+  }
+
+  & > .description {
+    text-transform: uppercase;
+  }
+
+  & > .exchange {
+    text-transform: initial;
   }
 }

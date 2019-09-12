@@ -614,3 +614,8 @@ a.highlight {
     height: auto;
     width: auto;
 }
+
+div.mat-expansion-panel-content:not(.mat-expanded) {
+  height: 0px !important;
+  visibility: hidden !important;
+}

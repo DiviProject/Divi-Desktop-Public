@@ -21,7 +21,7 @@ export class PassphraseService {
    * This is the logic for creating a new recovery phrase
   */
   generateMnemonic(success: Function) {
-    this._rpc.call('dumphdinfo').subscribe(response => success(response));
+    this._rpc.call('dumphdinfo').subscribe(response => success(response), err => this.log.er('generateMnemonic:', err));
   }
 
   validateWord(word: string): boolean {

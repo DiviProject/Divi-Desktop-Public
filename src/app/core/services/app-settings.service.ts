@@ -3,11 +3,13 @@ import * as _ from 'lodash';
 import { RpcStateService } from "../rpc/rpc.module";
 import { BehaviorSubject } from "rxjs";
 import { DiviService } from "./divi.service";
+import { Log } from "ng2-logger";
 
 @Injectable()
 export class AppSettingsService {
     private _net: string = null;
     public onNetChangeObs: BehaviorSubject<string> = new BehaviorSubject<string>(null);
+    private log: any = Log.create('app-settings.service');
 
     constructor(
         private rpcState: RpcStateService, 
@@ -29,6 +31,6 @@ export class AppSettingsService {
     public init(): void {
         this.diviService.call('settings', ['get', 'net'])
             .take(1)
-            .subscribe(net => this.rpcState.set('settings', net));
+            .subscribe(net => this.rpcState.set('settings', net), err => this.log.er('init:', err));
     }
 }

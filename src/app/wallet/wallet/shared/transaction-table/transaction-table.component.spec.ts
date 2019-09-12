@@ -7,7 +7,7 @@ import { WalletModule } from '../../../wallet/wallet.module';
 import { CoreModule } from '../../../../core/core.module';
 
 import { TransactionsTableComponent } from './transaction-table.component';
-import { TransactionsStateService } from '../transactions-state.service';
+import { TransactionsStateService } from '../../../../core/services/transactions-state.service';
 import { MockTransactionService } from 'app/wallet/wallet/shared/transaction.mockservice';
 
 

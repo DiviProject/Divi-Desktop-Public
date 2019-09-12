@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { TransactionsStateService } from '../shared/transactions-state.service';
-import { ExportService } from 'app/core/services/export.service';
+import { TransactionsStateService } from '../../../core/services/transactions-state.service';
 
 @Component({
   selector: 'app-history',
@@ -13,6 +12,9 @@ export class HistoryComponent implements OnInit {
   @ViewChild('transactions') transactions: any;
 
   sortby: string = 'blocktime';
+  sortdirection: string = 'desc';
+  fromDate: Date = null;
+  toDate: Date = null;
 
   sortFields: Array<any> = [
     { title: 'Sort by date', value: 'blocktime' },
@@ -20,11 +22,20 @@ export class HistoryComponent implements OnInit {
     { title: 'Sort by category', value: 'category' }
   ];
 
+  sortDirections: Array<any> = [
+    { title: 'Ascending', value: 'asc' },
+    { title: 'Descending', value: 'desc' }
+  ];
+
   categories: Array<any> = [
     { title: 'All',                value: 'all'               },
     { title: 'Sent',               value: 'send'              },
     { title: 'Received',           value: 'receive'           },
+    { title: 'Rewards',            value: 'mn_reward'         },
+    { title: 'Lottery',            value: 'lottery'           },
     { title: 'Transfers',          value: 'move'              },
+    { title: 'Allocated',          value: 'allocated'         },
+    { title: 'Staked',             value: 'stake_reward'      },
     // { title: 'Balance Transfers',  value: 'internal_transfer' },
     // { title: 'Immature',         value: 'immature'          },
     // { title: 'Coinbase',         value: 'coinbase'          },
@@ -43,6 +54,7 @@ export class HistoryComponent implements OnInit {
     category: undefined,
     search:   undefined,
     sort:     undefined,
+    sortDirection:     undefined,
     type:     undefined
   };
 
@@ -62,8 +74,16 @@ export class HistoryComponent implements OnInit {
       category: 'all',
       type:     'all',
       sort:     'blocktime',
+      sortDirection: 'desc',
       search:   ''
     };
+  }
+
+  onDateChange(): void {
+    this.filters.from = this.fromDate;
+    this.filters.to = this.toDate;
+
+    this.filter();
   }
 
   changeCategory(index: number): void {
@@ -82,8 +102,12 @@ export class HistoryComponent implements OnInit {
     this.transactions.filter(this.filters);
   }
 
-  sort(fld: string): void {
-    this.transactions.sort(fld);
+  sort(changed: string): void {
+    if (changed === 'fld') {
+      this.sortdirection = 'desc';
+    }
+
+    this.transactions.sort(this.sortby, this.sortdirection);
   }
 
   clear(): void {

@@ -3,6 +3,13 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ModalsComponent } from '../modals.component';
 
+const MAPPINGS = {
+  '*': 'li',
+  '#': 'h1'
+}
+
+const DEFAULT_TAG = 'p';
+
 @Component({
   templateUrl: './release-notes.component.html',
   styleUrls: ['./release-notes.component.scss']
@@ -40,26 +47,20 @@ export class ReleaseNotesComponent implements OnInit {
       return '';
     }
 
-    if (newLine.indexOf('##') === 0) {
-      return `<h2>${newLine.replace('##', '').trim()}</h2>`;
+    const firstSymbol = newLine[0];
+    const tag = MAPPINGS[firstSymbol];
+    if (tag) {
+      return `<${tag}>${newLine.replace(firstSymbol, '').trim()}</${tag}>`;
     }
 
-    if (newLine.indexOf('#') === 0) {
-      return `<h1>${newLine.replace('#', '').trim()}</h1>`;
-    }
-
-    if (newLine.indexOf('*') === 0) {
-      return `<li>${newLine.replace('*', '').trim()}</li>`;
-    }
-
-    return newLine;
+    return `<${DEFAULT_TAG}>${newLine}</${DEFAULT_TAG}>`;
   }
 
   private replace(str: string, oldValue: string, newValue: string): string {
     let temp = str;
     let index = 0;
     while (temp.indexOf(oldValue, index) > -1) {
-      index = temp.indexOf(oldValue, index) + newValue.length; 
+      index = temp.indexOf(oldValue, index) + newValue.length;
       temp = temp.replace(oldValue, newValue);
     }
     return temp;

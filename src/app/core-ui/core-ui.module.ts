@@ -7,6 +7,7 @@ import { MainViewModule } from './main/main-view.module';
 import { MatDialogModule } from '@angular/material';
 import { MatDialog } from '@angular/material';
 import { PaginatorComponent } from './paginator/paginator.component';
+import { MiniWalletViewModule } from './mini-wallet-view/mini-wallet-view.module';
 // TODO: move to material
 
 @NgModule({
@@ -17,11 +18,13 @@ import { PaginatorComponent } from './paginator/paginator.component';
     CommonModule,
     MaterialModule,
     MainViewModule,
+    MiniWalletViewModule,
     MatDialogModule // todo move
   ],
   exports: [
     MaterialModule,
     MainViewModule,
+    MiniWalletViewModule,
     PaginatorComponent
   ]
 })

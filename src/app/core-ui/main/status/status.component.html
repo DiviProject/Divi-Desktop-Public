@@ -21,20 +21,30 @@
     (click)="toggle()">
       <img src="assets/icons/SVG/{{ encryptionStatusIcon }}.svg"/>
   </span>
-  
-  <span 
-    class="staking icon"
-    [matTooltip]="stakingEnabled && isUnlockedForStaking ? 'Staking enabled' : (!isUnlockedForStaking ? 'Staking disabled' : stakingDescription)"
-    [ngClass]="{'enabled': stakingEnabled && isUnlockedForStaking, 'disabled': !isUnlockedForStaking, 'unlocked': isUnlockedForStaking && !stakingEnabled}"
-    container="body"
+
+  <mat-slide-toggle
+    *ngIf="walletInitialized"
+    [matTooltip]="stakingEnabled && isUnlockedForStaking ? 'Staking enabled' : (!isUnlockedForStaking ? 'Wallet locked' : stakingDescription)" 
+    [(ngModel)]="isUnlockedForStaking"
+    [disabled]="encryptionStatus === 'Unencrypted'"
+    (change)="toggleForStaking($event)"
     matTooltipPosition="below">
-      <img src="assets/icons/SVG/staking_icon.svg"/>
-  </span>
+  </mat-slide-toggle> 
+
+  <!-- <span  -->
+    <!-- class="staking icon" -->
+    <!-- [matTooltip]="stakingEnabled && isUnlockedForStaking ? 'Staking enabled' : (!isUnlockedForStaking ? 'Staking disabled' : stakingDescription)" -->
+    <!-- [ngClass]="{'enabled': stakingEnabled && isUnlockedForStaking, 'disabled': !isUnlockedForStaking, 'unlocked': isUnlockedForStaking && !stakingEnabled}" -->
+    <!-- container="body" -->
+    <!-- matTooltipPosition="below"> -->
+      <!-- <img src="assets/icons/SVG/staking_icon.svg"/> -->
+  <!-- </span> -->
 
     <span
     class="console icon"
     matTooltip="Debug Console"
     container="body"
+    *ngIf="showDebugConsole"
     (click)="openConsoleWindow()">
       <mat-icon class="icon" fontSet="partIcon" fontIcon="part-console-window"></mat-icon>
   </span>

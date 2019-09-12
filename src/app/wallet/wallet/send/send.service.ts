@@ -9,7 +9,7 @@ import { RpcService, SnackbarService, TransactionsService } from '../../../core'
 /* fix wallet */
 import { FixWalletModalComponent } from 'app/wallet/wallet/send/fix-wallet-modal/fix-wallet-modal.component';
 import { TransactionBuilder } from './transaction-builder.model';
-import { TransactionsStateService } from '../shared/transactions-state.service';
+import { TransactionsStateService } from '../../../core/services/transactions-state.service';
 
 /*
   Note: due to upcoming multiwallet, we should never ever store addresses in the GUI for transaction purposes.

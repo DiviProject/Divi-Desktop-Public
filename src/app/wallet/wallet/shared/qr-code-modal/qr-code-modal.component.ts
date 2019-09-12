@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MatDialogRef } from '@angular/material';
 
 import { SnackbarService } from '../../../../core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-qr-code-modal',
@@ -20,7 +21,8 @@ export class QrCodeModalComponent {
 
   constructor(
     private snackbar: SnackbarService,
-    public dialogRef: MatDialogRef<QrCodeModalComponent>
+    public dialogRef: MatDialogRef<QrCodeModalComponent>,
+    private router: Router
   ) { }
 
   getQrSize(): number {
@@ -37,6 +39,11 @@ export class QrCodeModalComponent {
 
   dialogClose(): void {
     this.dialogRef.close();
+  }
+
+  onSendClick(): void {
+    this.dialogClose();
+    this.router.navigate(['/wallet/send', this.singleAddress.address]);
   }
 
 }

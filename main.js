@@ -11,6 +11,7 @@ const Observable    = require('rxjs/Observable').Observable;
 const packageJson   = require('./package.json');
 const util          = require('./modules/util/util');
 const {autoUpdater} = require("electron-updater");
+const globalStore   = require('./modules/global-store/global-store');
 
 const DOUBLE_SHUTDOWN_INTERVAL_DELAY = ( 30 * 1000 );	//30 seconds in ms = 30 * 1000
 
@@ -207,6 +208,20 @@ function initMainWindow() {
     });
   }
 
+  //reboot or shutdown on win
+  mainWindow.on('session-end', (event) => {
+    if (event && event.preventDefault) {
+      event.preventDefault();
+    }
+    close();
+  });
+
+  //reboot or shutdown on linux & mac
+  mainWindow.on('shutdown', (event) => {
+    event.preventDefault();
+    close();
+  });
+
   mainWindow.on('close', (event) => {
     if (app.isQuiting) {
       setInterval( app.quit, DOUBLE_SHUTDOWN_INTERVAL_DELAY );
@@ -219,14 +234,27 @@ function initMainWindow() {
     if(!app.isQuiting && !app.isDaemonStopping){
 
       var isMac = process.platform === 'darwin';
-      if (isMac) { // skip confirmation
+      if (isMac && !globalStore.get('wallet:unlocked-for-staking')) { // skip confirmation
         return close();
+      } else if (isMac && !!globalStore.get('wallet:unlocked-for-staking')) { // unlocked for staking
+        return dialog.showMessageBox({
+          cancelId: -1,
+          type: 'question',
+          buttons: ['No', 'Yes'],
+          title: 'Confirm',
+          icon: path.join(__dirname, 'resources/icon.png'),
+          message: 'Are you sure you want to close Divi?'
+        }, function (response) {
+          if (response === 1) { // Exit
+            close();
+          }
+        });
       }
 
       dialog.showMessageBox({
         cancelId: -1,
         type: 'question',
-        buttons: ['Cancel', 'Minimize (Hide app)', 'Exit (Closing app)'],
+        buttons: ['Cancel', 'Minimize (Hide app)', 'Exit (Close app)'],
         title: 'Confirm',
         icon: path.join(__dirname, 'resources/icon.png'),
         message: 'How would you like to close Divi?'
@@ -282,7 +310,7 @@ function makeTray() {
   }
 
   // The tray context menu
-  const contextMenu = electron.Menu.buildFromTemplate([
+  const contextMenu = electron.Menu.buildFromTemplate((options.devtools ? [
     {
       label: 'View',
       submenu: [
@@ -296,6 +324,7 @@ function makeTray() {
         }
       ]
     },
+  ]: []).concat([
     {
       label: 'Window',
       submenu: [
@@ -351,7 +380,7 @@ function makeTray() {
           app.quit();
       }
     }
-  ]);
+  ]));
 
   // Create the tray icon
   let _tray = new electron.Tray(trayImage);

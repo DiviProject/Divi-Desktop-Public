@@ -4,7 +4,7 @@ import { Log } from 'ng2-logger';
 import { IPassword } from './password.interface';
 import { MatDialogRef } from '@angular/material';
 
-import { RpcService, RpcStateService, SecurityService } from '../../../core';
+import { RpcService, RpcStateService, SecurityService, SettingsService } from '../../../core';
 import { SnackbarService } from '../../../core/snackbar/snackbar.service';
 import { ModalsComponent } from '../../modals.component';
 import { Observable } from 'rxjs/Observable';
@@ -20,6 +20,8 @@ export class PasswordComponent implements OnDestroy {
   password: string;
   private destroyed: boolean = false;
 
+  public timeouts: any[] = [];
+
   @Input() showPass: boolean = false;
   @Input() label: string = 'Your Wallet password';
   @Input() buttonText: string;
@@ -29,7 +31,7 @@ export class PasswordComponent implements OnDestroy {
   @Input() isDisabled: boolean = false;
   @Input() isButtonDisable: boolean = false;
   @Input() showPassword: boolean = false;
-  @Input() unlockTimeout: number = 300;
+  @Input() unlockTimeout: number = null;
   @Input() alwaysUnlocked: boolean = false;
   @Input() isBackButtonDisabled: boolean = false;
 
@@ -51,21 +53,11 @@ export class PasswordComponent implements OnDestroy {
 
   log: any = Log.create('password.component');
 
-  public timeouts: any[] = [
-    { value: 60, title: "1 minute" },
-    { value: 120, title: "2 minutes" },
-    { value: 180, title: "3 minutes" },
-    { value: 300, title: "5 minutes" }, 
-    { value: 600, title: "10 minutes" },
-    { value: 1200, title: "20 minutes" },
-    { value: 1800, title: "30 minutes" },
-    { value: 0, title: "Always" }
-  ];
-
   constructor(private _rpc: RpcService,
               private _rpcState: RpcStateService,
               private flashNotification: SnackbarService,
               private securityService: SecurityService,
+              private settingsService: SettingsService,
               public dialogRef: MatDialogRef<ModalsComponent>) {
   }
 
@@ -73,6 +65,14 @@ export class PasswordComponent implements OnDestroy {
     if (this.alwaysUnlocked) {
       this.timeouts = [{ value: 0, title: "Always" }];
       this.unlockTimeout = 0;
+    } else {
+      this.timeouts = this.securityService.getTimeouts();
+      const settings = this.settingsService.loadSettings();
+      if (this.unlockTimeout == null && settings.main.unlockTimeout == null) {
+        this.unlockTimeout = 300; /* 5 mins */
+      } else if (this.unlockTimeout == null && settings.main.unlockTimeout != null) {
+        this.unlockTimeout = settings.main.unlockTimeout;
+      }
     }
   }
 
@@ -139,18 +139,8 @@ export class PasswordComponent implements OnDestroy {
       this.stakeOnly
     );
 
-    let _subs = this._rpcState.observe('getwalletinfo', 'encryptionstatus')
-    .takeWhile(() => !this.destroyed)
-    .skip(1)
-    .subscribe(
-      encryptionstatus => {
-        // hook for unlockEmitter, warn parent component that wallet is unlocked!
-        this.unlockEmitter.emit(encryptionstatus);
-        if (_subs) {
-          _subs.unsubscribe();
-          _subs = null;
-        }
-      });
+    const { encryptionstatus } = this._rpcState.get('getwalletinfo');
+    this.unlockEmitter.emit(encryptionstatus);
   }
 
   /**
@@ -166,7 +156,7 @@ export class PasswordComponent implements OnDestroy {
 
       // After unlockTimeout, unlock wallet for staking again.
       setTimeout((() => {
-          this._rpc.call('encryptwallet', [password, 0, true]).subscribe();
+          this._rpc.call('encryptwallet', [password, 0, true]).subscribe(_ => {}, err => this.log.er('checkAndFallbackToStaking:', err));
           this.reset();
         }).bind(this), (timeout + 1) * 1000);
 

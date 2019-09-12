@@ -64,7 +64,7 @@ export class AddressService {
         .subscribe(
           (success: Array<Object>) => {
             this.rpc_loadAddresses(success);
-          });
+          }, error => this.log.er('filteraddresses: ', error));
     } else {
       const addresses: Address[] = [];
       this._observerAddresses.next(addresses);

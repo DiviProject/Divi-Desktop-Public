@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RpcStateService, DaemonService } from '../../core';
-import { TransactionsStateService } from '../wallet/shared/transactions-state.service';
+import { TransactionsStateService } from '../../core/services/transactions-state.service';
 
 @Component({
   selector: 'app-overview',
@@ -15,7 +15,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   constructor(
     private rpcState: RpcStateService,
     private txService: TransactionsStateService,
-    private daemonService: DaemonService,
+    private daemonService: DaemonService
     ) { }
 
   ngOnInit() {

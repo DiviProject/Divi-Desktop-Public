@@ -12,6 +12,7 @@ import { MultiwalletModule } from './multiwallet/multiwallet.module';
 
 import { AppComponent } from './app.component';
 import { routing } from './app.routing';
+import { NewTxNotifierService } from './core';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,6 @@ import { routing } from './app.routing';
 })
 
 export class AppModule {
-  constructor() {
+  constructor(private newTxNotifierService: NewTxNotifierService) {
   }
 }

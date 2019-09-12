@@ -7,7 +7,7 @@ import { RpcModule } from '../../../core/rpc/rpc.module';
 import { CoreModule } from '../../../core/core.module';
 
 import { HistoryComponent } from './history.component';
-import { TransactionsStateService } from '../shared/transactions-state.service';
+import { TransactionsStateService } from '../../../core/services/transactions-state.service';
 
 import { TransactionsTableComponent } from 'app/wallet/wallet/shared/transaction-table/transaction-table.component';
 import { MockTransactionService } from 'app/wallet/wallet/shared/transaction.mockservice';

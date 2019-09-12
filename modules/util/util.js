@@ -9,17 +9,29 @@ const os = require('os');
 const OLD_EOL = /(?:\r\n|\r|\n)/g;
 
 function getRootOrResourcePath() {
-  var dir;
-  // running from packaged
-  if(__dirname.search('app.asar') > -1) {
-    dir = __dirname.substring(0, __dirname.indexOf('app.asar')) + 'app.asar';
-    dir = path.join(dir, 'dist/assets/icons/notification.png');
-  } else {
-    dir = '../../src/assets/icons/notification.png';
+  let iconPath = app.getAppPath() + '/dist/assets/icons/notification.png';
+
+  if (iconPath.indexOf('app.asar') > 0) {
+    iconPath = iconPath.replace('\\resources\\app.asar', '')
+      .replace('//resources//app.asar', '');
   }
-  return dir;
+
+  console.log(iconPath);
+  return iconPath;
 }
 exports.getRootOrResourcePath = getRootOrResourcePath;
+
+function getSoundPath(sound) {
+  let soundPath =  app.getAppPath() + `/dist/assets/icons/${sound}.wav`;
+
+  if (soundPath.indexOf('app.asar') > 0) {
+    soundPath = iconPath.replace('\\resources\\app.asar', '')
+      .replace('//resources//app.asar', '');
+  }
+
+  return soundPath;
+}
+exports.getSoundPath = getSoundPath;
 
 function diviConfFilePath(testnet) {
   if (testnet) {
@@ -56,6 +68,25 @@ function getRoamingDiviPath(path) {
   }
 }
 exports.getRoamingDiviPath = getRoamingDiviPath;
+
+function getUninstallerPath() {
+  let executablePath = '"' + app.getAppPath() + '/uninstall/uninstall-OS' + '"';
+
+  if (executablePath.indexOf('app.asar') > 0) {
+    executablePath = executablePath.replace('\\resources\\app.asar', '')
+      .replace('//resources//app.asar', '');
+  }
+
+  switch (process.platform) {
+    case 'win32':
+      return executablePath.replace('OS', 'win.exe');
+    case 'darwin':
+      return executablePath.replace('OS', 'macos');
+    default:
+      return executablePath.replace('OS', 'linux');
+  }
+}
+exports.getUninstallerPath = getUninstallerPath;
 
 function getRoamingDiviDesktopPath(path) {
   switch (process.platform) {

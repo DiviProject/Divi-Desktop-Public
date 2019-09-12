@@ -12,6 +12,7 @@ export class PrimerService {
   public enableAbandon: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public historyLogs: Array<string> = [];
   public onAutoRestore: EventEmitter<void> = new EventEmitter();
+  public onSuccess: EventEmitter<void> = new EventEmitter();
 
   private lastRestore: Date = new Date(1900, 1, 1);
   private isAbandoned: boolean = false;
@@ -57,12 +58,11 @@ export class PrimerService {
   }
 
   private async onError(e: any): Promise<void> {
-    console.log(e);
     this.isInProgressSub.next(false);
     this.enableAbandon.next(false);
     this.isErrorSub.next(true);
     this.historyLogs.push('Error in primer. ');
-    await this.daemonService.restart();
+    await (this.daemonService.restart().toPromise());
   }
 
   private async prepareEvent(eventType: string, eventData: any): Promise<void> {
@@ -93,7 +93,7 @@ export class PrimerService {
         this.historyLogs.push('Stopping daemon...');
         await this.invocationService.limited(() => (this.daemonService.stop().toPromise()), 3 * 60 * 1000); //3 mins max
         await this.invocationService.delay(10 * 1000);
-        this.rpc.call('apply-primer-backup');
+        await (this.rpc.call('apply-primer-backup').toPromise());
         break;
       case 'restoring-from-backup':
         this.enableAbandon.next(false);
@@ -106,6 +106,7 @@ export class PrimerService {
         this.lastRestore = new Date();
         this.historyLogs.push(`Restore successfully done.`);
         this.isInProgressSub.next(false);
+        this.onSuccess.emit();
         break;
       case 'cleaning-tmp-data':
         this.enableAbandon.next(false);
@@ -137,11 +138,11 @@ export class PrimerService {
   }
 
   public async abandon(): Promise<void> {
-    await this.rpc.call('abandon-primer');
+    await (this.rpc.call('abandon-primer').toPromise());
   }
 
   public async retry(): Promise<void> {
-    await this.rpc.call('retry-primer-restore');
+    await (this.rpc.call('retry-primer-restore').toPromise());
   }
 
   public async restore(manual?: boolean, delayStart?: boolean): Promise<void> {
@@ -161,7 +162,7 @@ export class PrimerService {
 
       try {
         await this.daemonService.stop();
-        await this.rpc.call('prepare-primer-backup');
+        await (this.rpc.call('prepare-primer-backup').toPromise());
       } catch (e) {
         await this.onError(e);
       }

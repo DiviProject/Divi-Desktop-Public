@@ -11,7 +11,10 @@ const daemon      = require('../daemon/daemon');
 const userSettings= require('../user/settings');
 const {autoUpdater} = require("electron-updater");
 const PrimerManager = require('../primer/primer').Manager;
-
+const CoinGeckoClient = require('../coin-gecko/coin-gecko');
+const CoinMarketCupClient = require('../coin-market-cup/coin-market-cup');
+const globalStore = require('../global-store/global-store');
+const modeManager = require('../mode-manager/mode-manager');
 
 /* spyOnRpc will output all RPC calls being made */
 const spyOnRpc = false;
@@ -188,6 +191,14 @@ function initIpcListener() {
       }
 
       switch (method) {
+        case 'change-mode':
+          modeManager.set(args[0]);
+          return onSuccess();
+        case 'global-store:set':
+          globalStore.set(args[0], args[1]);
+          return onSuccess();
+        case 'global-store:get':
+          return onSuccess(globalStore.get(args[0]));
         case 'restart-daemon':
           return daemon.restart(args).then(onSuccess, onError);
         case 'stop-daemon':
@@ -230,6 +241,10 @@ function initIpcListener() {
         case 'external-link':
           shell.openExternal(params[0]);
           return onSuccess();
+        case 'fetch-coin-gecko-prices': 
+          return CoinGeckoClient.fetch('divi').then(onSuccess, onError);
+        case 'fetch-coin-market-cup-prices': 
+          return CoinMarketCupClient.fetch('divi').then(onSuccess, onError);
         // auto-updater
         case 'check-update':
           autoUpdater.checkForUpdates();
@@ -240,6 +255,23 @@ function initIpcListener() {
         case 'install-update':
           autoUpdater.quitAndInstall();  
           return onSuccess();
+        case 'uninstall':
+          const uninstallerPath = _util.getUninstallerPath();
+          const sudo = require('sudo-prompt');
+          const options = {
+            name: 'Uninstall'
+          };
+
+          daemon.stop().then(() => {
+            sudo.exec(uninstallerPath, options,
+              function (error, stdout, stderr) {
+                if (error) throw error;
+                console.log('stdout: ' + stdout);
+              }
+            );
+            setTimeout(() => { app.exit(); }, 3000);
+          });
+          break;
         // rpc call's
         default: 
           return exports.call(method, params, handle);

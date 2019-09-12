@@ -23,6 +23,8 @@ export class PercentageBarComponent implements OnInit {
   private isDaemonStarted: boolean = false;
   private requireDaemonRestart: boolean = null;
   private requireDaemonRestartBlocksCount: number = 10;
+  private destroyed: boolean = false;
+  private connections: number = 1;
 
   @Input() sidebar: boolean = false;
 
@@ -62,26 +64,36 @@ export class PercentageBarComponent implements OnInit {
         clearTimeout(this.checkProgressTimeout);
         this.isDaemonStarted = isDaemonStarted;
       });
+
+    this.rpcState.observe('getnetworkinfo', 'connections')
+      .takeWhile(() => !this.destroyed)
+      .subscribe(connections => {
+        this.connections = connections;
+      });
   }
 
   updateProgress(status: any): void {
     this.initialized = true;
     
     if (this.requireDaemonRestart === null) {
-      this.requireDaemonRestart = status.remainingBlocks >= this.requireDaemonRestartBlocksCount;
+      this.requireDaemonRestart = status.remainingBlocks > this.requireDaemonRestartBlocksCount;
     }
 
     this.syncPercentage = status.syncPercentage;
     if (this.syncPercentage === 100) {
       if (this.requireDaemonRestart) {
         this.flashNotificationService.open('Restarting daemon... Please wait 30 seconds for functionality to be restored to your wallet..');
-        this.daemonService.restart().subscribe(_ => {});
+        this.daemonService.restart().subscribe(_ => {}, err => this.log.er('updateProgress: daemon-restart:', err));
       }
 
       this.syncString = 'Fully synced';
       this.requireDaemonRestart = null;
     } else {
       this.syncString = `${this.syncPercentage.toFixed(2)} %`;
+    }
+
+    if (this.connections <= 0) {
+      this.syncString = 'Not connected';
     }
   }
 
@@ -128,13 +140,17 @@ export class PercentageBarComponent implements OnInit {
           this.divi.call('remove-chainstate')
             .subscribe(() => {
               this.restartDaemon();
-            });
-        });
-    });
+            }, err => this.log.er('removeBlockData: remove-chainstate:', err));
+        }, err => this.log.er('removeBlockData: remove-blocks:', err));
+    }, err => this.log.er('removeBlockData: daemon-stop:', err));
   }
 
   restartDaemon() {
     this.flashNotificationService.open('Restarting daemon. Please wait 30 seconds before performing any other actions in the wallet.');
-    this.daemonService.restart().subscribe(() => { }, () => { });
+    this.daemonService.restart().subscribe(() => { }, err => this.log.er('resetDaemon:', err));
+  }
+
+  ngOnDestroy() {
+    this.destroyed = true;
   }
 }

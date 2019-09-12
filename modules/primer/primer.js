@@ -5,7 +5,7 @@ const utils = require('../util/util');
 const path = require('path');
 const mkdirp = require('mkdirp');
 const got = require('got');
-const unzip = require('node-unzip-2');
+const unzip = require('unzip-stream');
 const rimraf = require("rimraf");
 const fse = require('fs-extra');
 const log = require('electron-log');
@@ -36,9 +36,6 @@ function _download(url, destination) {
                 fs.accessSync(destination, fs.F_OK | fs.R_OK);
                 resolve();
             } catch (err) {
-                if (!!isAbandoned) {
-                    return resolve();
-                }
                 reject(err);
             }
         });
@@ -56,12 +53,11 @@ function _abandonDownload() {
 
 function _extract(path, destination) {
     const promise = new Promise((resolve, reject) => {
+        var unzipExtractor = unzip.Extract({ path: destination });
+        unzipExtractor.on('error', reject);
+        unzipExtractor.on('close', resolve);
         fs.createReadStream(path)
-            .pipe(
-                unzip.Extract({ path: destination })
-                    .on('close', resolve)
-                    .on('error', reject)
-            )
+            .pipe(unzipExtractor)
             .on('error', reject);
     });
 
@@ -116,9 +112,11 @@ async function wrapper(action) {
     try {
         await action();
     } catch (e) {
-        sendEvent('error', e);
-        log.error(e);
-        throw e;
+        if (!isAbandoned) {
+            sendEvent('error', e);
+            log.error(e);
+            throw e;
+        }
     }
 }
 

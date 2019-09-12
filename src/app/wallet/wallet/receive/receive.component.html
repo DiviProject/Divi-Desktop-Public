@@ -159,7 +159,7 @@
         [length]="getTotalCountForPagination()"
         [pageSize]="MAX_ADDRESSES_PER_PAGE"
         [pageSizeOptions]="PAGE_SIZE_OPTIONS"
-        (page)="pageChanged($event)">
+        (onChange)="pageChanged($event)">
       </app-paginator>
 
       <app-paginator
@@ -168,7 +168,7 @@
         [length]="getTotalCountForPagination()"
         [pageSize]="MAX_ADDRESSES_PER_PAGE"
         [pageSizeOptions]="PAGE_SIZE_OPTIONS"
-        (page)="pageChanged($event)">
+        (onChange)="pageChanged($event)">
       </app-paginator>
     </div>
   </div>

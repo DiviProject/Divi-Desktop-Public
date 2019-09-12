@@ -5,10 +5,9 @@ import { CommonModule } from '@angular/common';
 import { SharedModule } from '../shared/shared.module';
 import { CoreUiModule } from '../../core-ui/core-ui.module';
 
-import { TransactionsStateService } from './shared/transactions-state.service';
+import { TransactionsStateService } from '../../core/services/transactions-state.service';
 import { AddressService } from './shared/address.service';
 import { SendService } from './send/send.service';
-import { ColdstakeService } from '../overview/widgets/coldstake/coldstake.service';
 
 import { TransactionsTableComponent } from './shared/transaction-table/transaction-table.component';
 import { AddressTableComponent } from './shared/address-table/address-table.component';
@@ -88,7 +87,6 @@ export class WalletModule {
       providers: [
         AddressService,
         SendService,
-        ColdstakeService,
         TransactionsStateService
       ]
     };

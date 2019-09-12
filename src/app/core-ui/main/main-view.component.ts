@@ -80,8 +80,8 @@ export class MainViewComponent implements OnInit, OnDestroy {
       .flatMap(route => route.data)
       .subscribe(data => this.title = data['title']);
 
-
     /* errors */
+    this.daemonRunning = this._rpcState.get(RpcStateService.DAEMON_STARTED_KEY);
     // Updates the error box in the sidenav whenever a stateCall returns an error.
     this._rpcState.observe(RpcStateService.DAEMON_STARTED_KEY)
       .takeWhile(_ => !this.destroyed)

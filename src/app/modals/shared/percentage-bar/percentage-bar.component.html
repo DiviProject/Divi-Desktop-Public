@@ -1,7 +1,7 @@
 
 <!-- Sidebar sync progress -->
 <div class="sync-progress-wrapper" matTooltip="{{ syncString }}" matTooltipPosition="above">
-  <div *ngIf="!(syncPercentage === 100)">
+  <div *ngIf="!(syncPercentage === 100) && syncString !== 'Not connected'">
     <p class="sync-info">
       Syncing with the network
     </p>
@@ -15,7 +15,7 @@
     </mat-progress-bar>
   </div>
 
-  <div *ngIf="syncString === 'Fully synced'">
+  <div *ngIf="syncString === 'Fully synced' || syncString === 'Not connected'">
     <p class="sync-complete">
       {{ syncString }}
     </p>

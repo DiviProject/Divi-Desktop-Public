@@ -16,11 +16,11 @@ import {
 
 export class PaginatorComponent implements OnInit {
 
-  pageIndex: number = 0;
+  @Input() pageIndex: number = 0;
   @Input() length: number = 0;
   @Input() pageSize: number = 0;
   @Input() pageSizeOptions: number[] = [];
-  @Output() page: EventEmitter<PageEvent> = new EventEmitter<PageEvent>();
+  @Output() onChange: EventEmitter<PageEvent> = new EventEmitter<PageEvent>();
 
   @HostBinding('class.mat-paginator')
 
@@ -117,7 +117,7 @@ export class PaginatorComponent implements OnInit {
   }
 
   _emitPageEvent(): void {
-    this.page.next({
+    this.onChange.next({
       pageIndex: this.pageIndex,
       pageSize: this.pageSize,
       length: this.length

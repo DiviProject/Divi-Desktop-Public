@@ -2,7 +2,12 @@
   <div class="content">
     <div class="section">
       <div class="title">Primer</div>
-      <div class="description" *ngIf="!isErrorOccurred">The blockchain "Primer" serves as a method for out-of-sync wallets to quickly regain sync status.</div>
+      <div class="description" *ngIf="!isErrorOccurred">
+        The blockchain "Primer" serves as a method for out-of-sync wallets to quickly regain sync status.
+        <br/>
+        <br/>
+        This is recommended for new wallets in order to sync with the blockchain faster
+      </div>
 
       <ul class="history-logs" *ngIf="!isErrorOccurred">
         <li *ngFor="let log of primerService.historyLogs; let i = index; let last = last">
@@ -27,7 +32,7 @@
         <button mat-raised-button 
                 color="primary" 
                 (click)="retry()"
-                *ngIf="(dialogRef.componentInstance.enableClose && isErrorOccurred) || enableAbandon">
+                *ngIf="(dialogRef.componentInstance.enableClose && isErrorOccurred)">
           Retry
         </button>
         <button mat-raised-button 

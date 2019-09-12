@@ -19,4 +19,7 @@ export enum AuthScopes {
 
     // addresses
     ADDRESS_ADD_LABEL = "address_add_label",
+
+    // staking
+    STAKING = "staking"
 } 

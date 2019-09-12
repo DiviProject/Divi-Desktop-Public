@@ -26,6 +26,7 @@ import { UserSettingsService } from './services/user-settings.service';
 import { PrimerService } from './services/primer.service';
 import { SettingsService } from './services/settings.service';
 import { LocalStorage } from './services/local-storage.service';
+import { PriceService } from './services/price.service';
 
   /*
     Loading the core library will intialize IPC & RPC
@@ -64,6 +65,7 @@ export class CoreModule {
         SecurityService,
         AppSettingsService,
         LocalStorage,
+        PriceService,
 
         Auth2faService,
         UserInfoService,

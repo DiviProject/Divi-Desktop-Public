@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
 import {Observable} from 'rxjs/Observable';
 import {catchError, map, mergeMap, tap} from 'rxjs/operators';
@@ -6,10 +7,11 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {fromPromise} from 'rxjs/observable/fromPromise';
 import {Log} from 'ng2-logger';
 import {IpcService} from '../../core/ipc/ipc.service';
+import { CacheService } from '../cache/cache.service';
 
-const MAINNET_PORT = 51473;
-const TESTNET_PORT = 51475;
-const HOSTNAME = 'localhost';
+const MAINNET_PORT		= 51473;
+const TESTNET_PORT		= 51475;
+const HOSTNAME			= 'localhost';
 
 declare global {
   interface Window {
@@ -22,6 +24,7 @@ export class DiviService {
 
   private log: any = Log.create('rpc.service');
   private destroyed: boolean = false;
+  private uuid: string = null;
 
   /**
    * IP/URL for daemon (default = localhost)
@@ -36,15 +39,27 @@ export class DiviService {
   private username: string = 'test';
   private password: string = 'test';
 
-  private static diviPrices: any = null;
-
   public isElectron: boolean = false;
-
+ 
   constructor(
     private _http: HttpClient,
     private _ipc: IpcService,
+    private _cacheService: CacheService
   ) {
     this.isElectron = window.electron;
+    let buf = localStorage.getItem( "uuid" );
+    if( buf && ( buf.length > 0 ) )	{
+	    this.uuid = buf;
+    }
+    if( !this.uuid || ( this.uuid.length < 9 ) )	{
+	    this.uuid = uuid();
+    }
+    localStorage.setItem( "uuid", this.uuid );
+    console.log( "UUID : " + this.uuid );
+  }
+  
+  getUUID(): string	{
+	  return this.uuid;
   }
 
   callDiviMap(method: string, params?: Array<any> | null): [string | null, any] {
@@ -186,17 +201,6 @@ export class DiviService {
         };
     }
     return params
-  }
-
-  getDiviPrices(): Observable<any> {
-    if (!!DiviService.diviPrices) {
-      return Observable.of(DiviService.diviPrices);
-    }
-
-    return this._http.get("http://142.93.141.60:1397/quote/3441")
-      .pipe(map((r: any) => {
-        return { usd: r.USD.price };
-      }), tap(r => DiviService.diviPrices = r));
   }
 
   diviFilterAddresses(params: any[]): [string | null, any] {
@@ -341,5 +345,4 @@ export class DiviService {
     addressBook[foundIndex].label = label;
     localStorage.setItem('addressBook', JSON.stringify(addressBook));
   }
-
 }

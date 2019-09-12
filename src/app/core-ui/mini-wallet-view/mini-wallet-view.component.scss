@@ -1,0 +1,79 @@
+@import "./src/assets/_config"; // import shared colors etc.
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.mini-mode {
+  padding: 0 10px;
+  
+  .mini-section {
+    margin-bottom: 30px;
+
+    .description {
+      font-weight: bold;
+    }
+  }
+
+  table {
+    width: 100%;
+
+    tr {
+      td {
+        &:first-child {
+          width: 50%;
+          text-align: left;
+          font-weight: bold;
+        }
+
+        &:last-child {
+          width: 50%;
+          text-align: left;
+        }
+
+        &.text {
+          font-weight: normal;
+        }
+      }
+    }
+  }
+
+  .node-started {
+    color: green;
+    margin-left: 5px;
+  }
+
+  .node-not-started {
+    color: #D0021B;
+    margin-left: 5px;
+  }
+
+  .node-retrieving {
+    margin-left: 5px;
+  }
+}
+
+.button {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.loading-wallet {
+  margin-top: 150px;
+  img {
+    width: 100px;
+  }
+}

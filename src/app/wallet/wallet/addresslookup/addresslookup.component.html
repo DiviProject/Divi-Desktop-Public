@@ -46,6 +46,6 @@
     #paginator
     [length]="getTotalCountForPagination()"
     [pageSize]="MAX_ADDRESSES_PER_PAGE"
-    (page)="pageChanged($event)">
+    (onChange)="pageChanged($event)">
   </app-paginator>
 </div>

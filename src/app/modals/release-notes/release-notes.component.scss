@@ -22,3 +22,13 @@
   font-weight: 700;
   margin-bottom: 10px;
 }
+
+::ng-deep {
+  p, li {
+    font-size: 0.85rem;
+  }
+
+  li {
+    list-style: none;
+  }
+}

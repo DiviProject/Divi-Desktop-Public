@@ -1,6 +1,6 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSlideToggleChange } from '@angular/material';
 import { Subscription } from 'rxjs/Subscription';
 import { Log } from 'ng2-logger';
 
@@ -10,6 +10,7 @@ import { RpcService, RpcStateService } from '../../../core';
 import { ConsoleModalComponent } from './modal/help-modal/console-modal.component';
 import { AuthScopes } from 'app/core/models/auth-scopes.enum';
 import { BlockStatusService } from 'app/core/rpc/rpc.module';
+import { SettingsService } from 'app/core/services/settings.service';
 
 
 @Component({
@@ -30,6 +31,7 @@ export class StatusComponent implements OnInit, OnDestroy {
   private stakinginfo: any = null;
   private _sub: Subscription;
   private destroyed: boolean = false;
+  private showDebugConsole: boolean = false;
 
   private log: any = Log.create('status.component');
 
@@ -39,6 +41,7 @@ export class StatusComponent implements OnInit, OnDestroy {
     private _rpc: RpcService,
     private _rpcState: RpcStateService,
     private _modalsService: ModalsService,
+    public settingsService: SettingsService,
     private dialog: MatDialog) { }
 
   ngOnInit() {
@@ -66,13 +69,36 @@ export class StatusComponent implements OnInit, OnDestroy {
         if (!!this.stakinginfo) {
           const props = Object.keys(this.stakinginfo);
           this.stakingEnabled = props.filter(p => !!status[p]).length === props.length;
-          this.stakingDescription = props.filter(p => !status[p]).map(p => `${p}: false`).join(', ');
+
+          if (!!props.filter(p => !status[p])[0]) {
+            this.stakingDescription = this.getStakingDescription(props.filter(p => !status[p])[0]);
+          }
         }
       });
 
     this._rpcState.observe('ui:walletInitialized')
       .takeWhile(() => !this.destroyed)
       .subscribe(status => this.walletInitialized = status);
+
+      this.settingsService.onChange.subscribe(s => {
+          const settings = this.settingsService.loadSettings();
+          this.showDebugConsole = settings.main.advancedMode;
+      });
+  }
+
+  getStakingDescription(status: string) {
+    switch (status) {
+      case 'enoughcoins':
+        return 'Not enough coins';
+      case 'mintablecoins':
+        return 'Coins maturing';
+      case 'walletunlocked':
+        return 'Please unlock wallet';
+      case 'staking status':
+        return 'Please restart client';
+      default:
+        return 'Syncing';
+    }
   }
 
   ngOnDestroy() {
@@ -124,6 +150,10 @@ export class StatusComponent implements OnInit, OnDestroy {
     await this._modalsService.unlock(AuthScopes.UNLOCK_WALLET, null, true);
   }
 
+  async unlockForStaking(): Promise<void> {
+    await this._modalsService.unlock(AuthScopes.UNLOCK_WALLET, null, true, true);
+  }
+
   encryptwallet(): void {
     this._modalsService.open('encrypt', {'forceOpen': true});
   }
@@ -142,6 +172,17 @@ export class StatusComponent implements OnInit, OnDestroy {
         break;
       default:
         break;
+    }
+  }
+
+  async toggleForStaking(value: MatSlideToggleChange) {
+    const { checked } = value;
+    if (!checked) {
+      this.lockwallet();
+      this.isUnlockedForStaking = false;
+    } else {
+      const result = await this._modalsService.unlock(AuthScopes.STAKING, null, true, true);
+      this.isUnlockedForStaking = result;
     }
   }
 

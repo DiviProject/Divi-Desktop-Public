@@ -3,8 +3,9 @@ import { PageEvent } from '@angular/material';
 import { Log } from 'ng2-logger'
 
 import { Transaction } from '../transaction.model';
-import { TransactionsStateService } from '../transactions-state.service';
-import { BlockStatusService, ExportService, RpcService, RpcStateService } from '../../../../core';
+import { TransactionsStateService } from '../../../../core/services/transactions-state.service';
+import { BlockStatusService, ExportService, RpcStateService } from '../../../../core';
+import { SettingsService, DEFAULT_PAGE_SIZE } from '../../../../core/services/settings.service';
 import { DateFormatter } from 'app/core/util/utils';
 import { ExportField } from 'app/core/models/export-field';
 
@@ -26,7 +27,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     header: true,
     internalHeader: false,
     pagination: false,
-    txDisplayAmount: 10,
+    paginationPosition: 'bottom',
+    txDisplayAmount: null,
     category: true,
     date: true,
     amount: true,
@@ -52,13 +54,17 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     public txService: TransactionsStateService,
     public blockStatusService: BlockStatusService,
     private exportService: ExportService,
-    private rpcState: RpcStateService
+    private rpcState: RpcStateService,
+    private settingsService: SettingsService
   ) {
   }
 
   ngOnInit(): void {
+    const settings = this.settingsService.loadSettings();
+
+    const pageSize = this.display.txDisplayAmount || Number(settings.display.rows) || DEFAULT_PAGE_SIZE;
     this.display = Object.assign({}, this._defaults, this.display); // Set defaults
-    this.txService.postConstructor(this.display.txDisplayAmount);
+    this.txService.postConstructor(pageSize);
 
     this.rpcState.observe('ui:walletInitialized')
     .takeWhile(() => !this.destroyed)
@@ -69,8 +75,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.destroyed = true;
   }
 
-  public sort(fld: string): void {
-    this.txService.sort(fld);
+  public sort(fld: string, dir: string): void {
+    this.txService.sort(fld, dir);
   }
 
   public filter(filters: any) {
@@ -128,6 +134,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         new ExportField("Amount of tx", (r, f) => r.displayInfo.amount),
         new ExportField("TxID", (r, f) => r.txid)
       ], result.transactions, "transactions.csv");
-    });
+    }, error => this.log.er('export: ', error));
   }
 }

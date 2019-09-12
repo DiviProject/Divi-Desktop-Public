@@ -90,7 +90,7 @@ export class ChangePasswordComponent {
             this.closeModal();
           }, err => {
             this.flashNotification.open('The wallet passphrase entered was incorrect.', 'err');
-            this.log.er(err);
+            this.log.er('walletpassphrasechange: ', err);
             this.rpcState.set('ui:spinner', false);
           });
       }

@@ -7,6 +7,7 @@
   <link rel="stylesheet" type="text/css" href="assets/index.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script type="text/javascript" src="quotes.json"></script>
 </head>
 <body>
   <app-root>
@@ -14,15 +15,22 @@
     <div class="section intro">
       <div class="content">
 
-        <img class="logo" src="assets/divi-logo-only.svg" style="margin-left:50px;margin-bottom:-20px;">
+        <img class="logo" src="assets/divi-logo-only.svg">
 
         <blockquote class="quote">
           <p>Divi Project</p>
+          <p id="quote"></p>
+          <p id="author"></p>
+          <script type="text/javascript">
+            const randomQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+            document.getElementById("quote").textContent = randomQuote.quote;
+            document.getElementById("author").textContent = randomQuote.author;
+          </script>
         </blockquote>
 
       </div><!-- .content -->
     </div><!-- .intro -->
-
+     
   </app-root>
 </body>
 </html>

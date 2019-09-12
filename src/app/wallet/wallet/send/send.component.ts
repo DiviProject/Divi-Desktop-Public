@@ -1,7 +1,9 @@
 import { Component, OnInit, ElementRef, ViewChild, HostListener } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
 import { MatDialog } from '@angular/material';
 import { Log } from 'ng2-logger';
+import { FormControl } from '@angular/forms';
+import { Observable } from "rxjs";
+import { map, startWith } from 'rxjs/operators';
 
 import { ModalsService } from '../../../modals/modals.service';
 import { RpcService } from '../../../core/rpc/rpc.service';
@@ -18,11 +20,14 @@ import { SendConfirmationModalComponent } from './send-confirmation-modal/send-c
 import { AddressHelper } from '../../../core/util/utils';
 import { TransactionBuilder, TxType } from './transaction-builder.model';
 
-import * as rp from 'request-promise';
 import * as _ from 'lodash';
-import { BalanceService, DiviService, BlockStatusService } from '../../../core';
+import { BalanceService, BlockStatusService } from '../../../core';
 import { FullBalanceInfo } from '../../../core/models/full-balance-info';
 import { AuthScopes } from 'app/core/models/auth-scopes.enum';
+import { PriceService } from 'app/core/services/price.service';
+import { Contact } from '../addresslookup/contact.model';
+import { ExchangeType } from 'app/core/models/exchange-type.enum';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-send',
@@ -31,8 +36,6 @@ import { AuthScopes } from 'app/core/models/auth-scopes.enum';
   styleUrls: ['./send.component.scss', '../../settings/settings.component.scss']
 })
 export class SendComponent implements OnInit {
-
-
   // General
   log: any = Log.create('send.component');
   private addressHelper: AddressHelper;
@@ -51,6 +54,10 @@ export class SendComponent implements OnInit {
   public send: TransactionBuilder;
   private destroyed: boolean = false;
   private isFullySynced: boolean = false;
+  private addressCount: number = 0; 
+  addressLookups: Contact[] = [];
+  filteredAddressLookups: Observable<Contact[]>;
+  stateCtrl = new FormControl();
 
   constructor(
     private sendService: SendService,
@@ -60,15 +67,16 @@ export class SendComponent implements OnInit {
     private dialog: MatDialog,
     private flashNotification: SnackbarService,
     private balanceService: BalanceService,
-    private diviService: DiviService,
+    private priceService: PriceService,
     private blockStatusService: BlockStatusService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private route: ActivatedRoute
   ) {
     this.progress = 50;
     this.addressHelper = new AddressHelper();
 
-    this.diviService.getDiviPrices()
-      .subscribe(prices => this.prices = prices);
+    const settings = this.settingsService.loadSettings();
+    this.priceService.getPrices().then(prices => this.prices = prices[settings.display.exchanges[0]]);
 
     this.setFormDefaultValue();
 
@@ -76,6 +84,11 @@ export class SendComponent implements OnInit {
       .takeWhile(() => !this.destroyed)
       .subscribe((isFullSynced) => {
         this.isFullySynced = isFullSynced;
+      });
+
+      this.route.params.subscribe((params) => {
+        this.send.toAddress = params["address"];
+        this.verifyAddress();
       });
   }
 
@@ -97,7 +110,13 @@ export class SendComponent implements OnInit {
 
     this._rpc.call('listunspent').subscribe(txs => {
       this.enableCombine = txs.length > 1;
-    });
+    }, error => this.log.er('listunspent: ', error));
+
+    this.loadAddressBook();
+    this.filteredAddressLookups = this.stateCtrl.valueChanges.pipe(
+      // startWith(''),
+      map(value => this.filterAddressBook(String(value)))
+    );
   }
   /** Select tab */
   selectTab(tabIndex: number): void {
@@ -125,6 +144,56 @@ export class SendComponent implements OnInit {
     if (account === TxType.BLIND) {
       return parseFloat(this.getBalanceString(account)) < 0.0001 && parseFloat(this.getBalanceString(account)) > 0;
     }
+  }
+
+  private loadAddressBook(): void {
+    this._rpc.call('filteraddresses', [-1])
+      .subscribe(
+        (response: any) => {
+          const typeInt = '2';
+          this.addressCount = response.num_send;
+
+          if (this.addressCount > 0) {
+            this._rpc.call('filteraddresses', [0, this.addressCount, '0', '', typeInt])
+              .subscribe(
+                (success: any) => {
+                  this.addressLookups = [];
+                  success.forEach((contact) => {
+                    if (contact.label && contact.label.trim() !== '') {
+                      this.addressLookups.push(new Contact(contact.label, contact.address));
+
+                      if (this.send.toAddress === contact.address) {
+                        this.send.toLabel = contact.label;
+                      }
+                    }
+                  });
+                },
+                error => this.log.er('error', error));
+          } else {
+            this.addressLookups = [];
+          }
+        },
+        (error: any) => this.log.er('rpc_update: filteraddresses Failed!', error));
+  }
+
+  private filterAddressBook(value: string): Contact[] {
+    const filterValue = value.toLowerCase();
+
+    if (filterValue === '') {
+      return null;
+    }
+
+    return this.addressLookups.filter(option => option.getLabel().toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  public fillAddress(address: Contact) {
+    const addressString = address.getAddress();
+
+    if (addressString && addressString.trim() !== '') {
+      this.send.toAddress = address.getAddress();
+    }
+
+    this.verifyAddress();
   }
 
   private txTypeToBalanceType(type: TxType): string {

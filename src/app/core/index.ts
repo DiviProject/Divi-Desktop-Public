@@ -18,5 +18,5 @@ export { ExportService } from './services/export.service';
 export { SecurityService } from './services/security.service';
 export { AppSettingsService } from './services/app-settings.service';
 export { PrimerService } from './services/primer.service';
-export { SettingsService } from './services/settings.service';
+export { SettingsService, DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS } from './services/settings.service';
 export { LocalStorage } from './services/local-storage.service';

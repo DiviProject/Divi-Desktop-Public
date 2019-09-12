@@ -7,9 +7,7 @@ import { CoreModule } from '../../core/core.module';
 import { CoreUiModule } from '../../core-ui/core-ui.module';
 
 import { OverviewComponent } from './overview.component';
-import { StakinginfoComponent } from './widgets/stakinginfo/stakinginfo.component';
-import { ColdstakeComponent } from './widgets/coldstake/coldstake.component';
-import { TransactionsStateService } from '../wallet/shared/transactions-state.service';
+import { TransactionsStateService } from '../../core/services/transactions-state.service';
 
 import { TransactionsTableComponent } from 'app/wallet/wallet/shared/transaction-table/transaction-table.component';
 import { MockTransactionService } from 'app/wallet/wallet/shared/transaction.mockservice';
@@ -29,9 +27,7 @@ describe('OverviewComponent', () => {
         ModalsModule.forRoot(),
       ],
       declarations: [
-        OverviewComponent,
-        StakinginfoComponent,
-        ColdstakeComponent
+        OverviewComponent
       ]
     })
 

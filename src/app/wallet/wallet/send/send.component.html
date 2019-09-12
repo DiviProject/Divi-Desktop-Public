@@ -18,14 +18,14 @@
 
 <div class="container-block disable-select">
 
-  <!--<div class="from-box">
+  <div class="from-box">
     <mat-card>
       <app-balance [types]="['spendable']" type="balance" [tooltips]="{ 'spendable': 'You can send/spend this amount' }"></app-balance>
-      <button mat-raised-button color="primary" (click)="combineUtxos()" *ngIf="isFullySynced && enableCombine">
+      <!--<button mat-raised-button color="primary" (click)="combineUtxos()" *ngIf="isFullySynced && enableCombine">
         Combine UTXOs
-      </button>
+      </button>-->
     </mat-card>
-  </div>--><!-- .from-box -->
+  </div><!-- .from-box -->
 
   <div class="to-box">
     <form name="walletSendForm">
@@ -94,14 +94,19 @@
           </div>
           <mat-form-field class="full-width larger no-top-padding" floatPlaceholder="never">
             <input name="toLabel" matInput type="text" placeholder="Receiver's name (optional)"
-                   [(ngModel)]="send.toLabel">
+                   [(ngModel)]="send.toLabel" [matAutocomplete]="auto" [formControl]="stateCtrl">
+            <mat-autocomplete #auto="matAutocomplete">
+              <mat-option *ngFor="let address of filteredAddressLookups | async" [value]="address.getLabel()" (onSelectionChange)="fillAddress(address)">
+                {{ address.getLabel() }}
+              </mat-option>
+            </mat-autocomplete>
           </mat-form-field>
           <p class="widget-help">
             You can save Receiver's address to your Address book by labeling it here.
           </p>
         </div><!-- .receiver-address.section -->
       </mat-card><!-- .pay-to -->
-
+       
       <!-- Send amount % buttons -->
       <mat-card class="send-amount" fxLayout="row" fxLayoutGap="15px" fxLayoutAlign="start center">
         <mat-form-field fxFlex="0 0 150px">

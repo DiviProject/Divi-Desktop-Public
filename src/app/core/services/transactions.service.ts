@@ -8,17 +8,19 @@ import { CacheService } from '../cache/cache.service';
 import { LocalStorage } from './local-storage.service';
 import { AppSettingsService } from './app-settings.service';
 import { DaemonService } from '../daemon/daemon.service';
+import { Log } from 'ng2-logger';
 
-const TRANSACTIONS_CACHE_KEY = "TRANSACTIONS_CACHE";
-const TRANSACTIONS_CACHE_KEY_PER_NETWORK = (net: string) => `TRANSACTIONS_${net}`;
-const TRANSACTIONS_CACHE_EXPIRATION = 60*1;
-const LIST_TRANSACTIONS_DELAY = 5000;
+const TRANSACTIONS_CACHE_KEY				= "TRANSACTIONS_CACHE";
+const TRANSACTIONS_CACHE_KEY_PER_NETWORK	= (net: string) => `TRANSACTIONS_${net}`;
+const TRANSACTIONS_CACHE_EXPIRATION			= ( 60 * 1 );
+const LIST_TRANSACTIONS_DELAY				= ( 5 * 1000 );
 
 @Injectable()
 export class TransactionsService implements OnDestroy {
   private destroyed: boolean = false;
   private net: string = null;
   private shareObservable: any = null;
+  private log: any = Log.create('transaction.service');
 
   constructor(
     private rpc: RpcService,
@@ -74,12 +76,13 @@ export class TransactionsService implements OnDestroy {
         });
 
         this.cacheService.set(TRANSACTIONS_CACHE_KEY, transactions, TRANSACTIONS_CACHE_EXPIRATION);
-        const lastTransactions = transactions.concat().sort((a, b) => a.time < b.time ? 1 : -1).slice(0, 1000);
+        const lastTransactions = transactions.sort((a, b) => a.time < b.time ? 1 : -1).slice(0, 1000);
         this.localStorage.set(TRANSACTIONS_CACHE_KEY_PER_NETWORK(this.net), lastTransactions);
         obs.next(transactions);
         obs.complete();
         setTimeout(_ => this.shareObservable = null, LIST_TRANSACTIONS_DELAY);
       }, err => {
+        this.log.er('getTransactions: ', err);
         this.shareObservable = null;
         // when daemon not started
         const transactions = this.localStorage.get(TRANSACTIONS_CACHE_KEY_PER_NETWORK(this.net));
@@ -108,9 +111,9 @@ export class TransactionsService implements OnDestroy {
           if (whenCombined) {
             whenCombined(_.sum(results));
           }
-        });
+        }, err => this.log.er('combineUtxos: forkJoin:', err));
       }
-    });
+    }, err => this.log.er('combineUtxos: listunspent:',err));
   }
 
   private combineUtxoChunk(txs: any[]): Observable<number> {

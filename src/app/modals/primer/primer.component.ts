@@ -31,9 +31,11 @@ export class PrimerComponent implements OnDestroy {
 
     this.subs.push(this.primerService.isInProgressSub.subscribe((inProgress) => {
       this.dialogRef.componentInstance.enableClose = !inProgress;
-      if (inProgress) {
-        this.isRestoreVisible = false;
-      }
+      this.isRestoreVisible = !inProgress;
+    }));
+
+    this.subs.push(this.primerService.onSuccess.subscribe(() => {
+      this.close();
     }));
 
     this.subs.push(this.primerService.isErrorSub.subscribe((isError) => {

@@ -5,6 +5,7 @@ import { environment } from '../../../../environments/environment';
 import { ReleaseNotification } from './release-notification.model';
 
 import { ClientVersionService } from '../../../core/http/client-version.service';
+import { Log } from 'ng2-logger';
 
 @Component({
   selector: 'app-release-notification',
@@ -17,6 +18,7 @@ export class ReleaseNotificationComponent implements OnInit, OnDestroy {
   public latestClientVersion: string;
   public releaseUrl: string;
   private destroyed: boolean = false;
+  private log: any = Log.create('release-notifications.component');
 
   constructor(private clientVersionService: ClientVersionService) { }
 
@@ -39,7 +41,7 @@ export class ReleaseNotificationComponent implements OnInit, OnDestroy {
         }
 
         this.releaseUrl = response.html_url;
-      });
+      }, err => this.log.er('getCurrentClientVersion: ', err));
   }
 
   isNewUpdateAvailable(): boolean {

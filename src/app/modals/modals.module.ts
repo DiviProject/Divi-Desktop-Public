@@ -14,8 +14,6 @@ import { DeleteConfirmationModalComponent } from '../wallet/shared/delete-confir
 
 /* modals */
 import { CreateWalletComponent } from './createwallet/createwallet.component';
-import { ColdstakeComponent } from './coldstake/coldstake.component';
-import { DaemonComponent } from './daemon/daemon.component';
 import { SyncingComponent } from './syncing/syncing.component';
 import { UnlockwalletComponent } from './unlockwallet/unlockwallet.component';
 import { EncryptwalletComponent } from './encryptwallet/encryptwallet.component';
@@ -27,7 +25,6 @@ import { PasswordComponent } from './shared/password/password.component';
 import { MultiwalletComponent } from './multiwallet/multiwallet.component';
 
 import { SnackbarService } from '../core/snackbar/snackbar.service';
-import { DaemonConnectionComponent } from './shared/daemon-connection/daemon-connection.component';
 import { AutoUpdateComponent } from './auto-update/auto-update.component';
 import { ReleaseNotesComponent } from './release-notes/release-notes.component';
 import { WalletVerifyResultComponent } from './wallet-verify-result/wallet-verify-result.component';
@@ -36,6 +33,7 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
 import { Verify2faComponent } from './verify-2fa/verify-2fa.component';
 import { PrimerComponent } from './primer/primer.component';
 import { CombineUtxoComponent } from './combine-utxo/combine-utxo.component';
+import { UninstallComponent } from './uninstall/uninstall.component';
 import { TfaSettingsComponent } from './tfa-settings/tfa-settings.component';
 import { Setup2faComponent } from './tfa-settings/setup-2fa/setup-2fa.component';
 import { Update2faComponent } from './tfa-settings/update-2fa/update-2fa.component';
@@ -57,14 +55,11 @@ import { TfaScopesComponent } from './tfa-settings/tfa-scopes/tfa-scopes.compone
     PassphraseComponent,
     PasswordComponent,
     CreateWalletComponent,
-    DaemonComponent,
     SyncingComponent,
     UnlockwalletComponent,
     EncryptwalletComponent,
     AlertComponent,
-    ColdstakeComponent,
     MultiwalletComponent,
-    DaemonConnectionComponent,
     AutoUpdateComponent,
     ReleaseNotesComponent,
     WalletVerifyResultComponent,
@@ -72,6 +67,7 @@ import { TfaScopesComponent } from './tfa-settings/tfa-scopes/tfa-scopes.compone
     ChangePasswordComponent,
     PrimerComponent,
     CombineUtxoComponent,
+    UninstallComponent,
 
     Verify2faComponent,
     TfaScopesComponent,
@@ -92,12 +88,10 @@ import { TfaScopesComponent } from './tfa-settings/tfa-scopes/tfa-scopes.compone
   entryComponents: [
     ModalsComponent,
     DeleteConfirmationModalComponent,
-    DaemonComponent,
     SyncingComponent,
     UnlockwalletComponent,
     EncryptwalletComponent,
     AlertComponent,
-    DaemonConnectionComponent,
     AutoUpdateComponent,
     ReleaseNotesComponent,
     WalletVerifyResultComponent,
@@ -105,6 +99,7 @@ import { TfaScopesComponent } from './tfa-settings/tfa-scopes/tfa-scopes.compone
     ChangePasswordComponent,
     PrimerComponent,
     CombineUtxoComponent,
+    UninstallComponent,
 
     Verify2faComponent,
     TfaScopesComponent,

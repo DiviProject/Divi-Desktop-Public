@@ -213,7 +213,7 @@ function getConfirmationInfo(tx: Transaction): any {
     const confirmations = getNeedConfirmationsByCategory(tx.category);
 
     if (confirmations > tx.confirmations) {
-      return `${confirmations - tx.confirmations} Confirmations before spendable`;
+      return `${tx.confirmations}/${confirmations} confirmations`;
     }
 
     switch (tx.category) {

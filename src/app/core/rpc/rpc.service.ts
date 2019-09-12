@@ -79,13 +79,13 @@ export class RpcService implements OnDestroy {
     }
     
     return this._ipc.runCommand('rpc-channel', null, mMethod, mParams)
-    .pipe(
-      mergeMap(response => fromPromise(this._divi.responseDiviMap(method, params, response))),
-      catchError(error => Observable.throw(typeof error._body || error === 'object'
-          ? error._body || error
-          : JSON.parse(error._body || error))
-      )
-    );
+      .pipe(
+        mergeMap(response => fromPromise(this._divi.responseDiviMap(method, params, response))),
+        catchError(error => Observable.throw(typeof error._body || error === 'object'
+            ? error._body || error
+            : JSON.parse(error._body || error))
+        )
+      );
   }
 
   callGroup(method: string, groupParams: any[], params?: any[] | null): Observable<any> {

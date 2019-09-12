@@ -43,8 +43,7 @@ $radius: 4px; // default border-radius
 .logo {
   width: 240px;
   height: auto;
-  margin: 20px 0 40px;
-  padding-left: 35px;
+  margin: 20px 0 -20px 0;
 }
 
 .quote {
@@ -59,4 +58,16 @@ $radius: 4px; // default border-radius
 .loading {
   width: 100%;
   max-width: 100px;
+}
+
+#quote {
+  margin-top: 50px;
+  font-size: 15px;
+  color: #7E8790;
+}
+
+#author {
+  font-style: italic;
+  font-size: 13px;
+  color: #7E8790;
 }

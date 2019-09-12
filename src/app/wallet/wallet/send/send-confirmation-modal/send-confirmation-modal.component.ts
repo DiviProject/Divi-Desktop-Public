@@ -5,7 +5,10 @@ import { SendService } from '../send.service';
 
 import { Amount, Fee } from '../../../../core/util/utils';
 import { TransactionBuilder } from '../transaction-builder.model';
-import { DiviService } from 'app/core/services/divi.service';
+import { Log } from 'ng2-logger';
+import { PriceService } from 'app/core/services/price.service';
+import { ExchangeType } from 'app/core/models/exchange-type.enum';
+import { SettingsService } from 'app/core';
 
 @Component({
   selector: 'app-send-confirmation-modal',
@@ -28,17 +31,18 @@ export class SendConfirmationModalComponent implements OnInit {
   receiverName: string = '';
   transactionAmount: Fee = new Fee(0);
 
+  private log: any = Log.create('send-confirmation.modal');
+
   constructor(private dialogRef: MatDialogRef<SendConfirmationModalComponent>,
               private sendService: SendService,
-              private diviService: DiviService) {
+              private priceService: PriceService,
+              private settingsService: SettingsService) {
   }
 
-  ngOnInit() {
-
-    this.diviService.getDiviPrices()
-      .subscribe(prices => {
-        this.setDetails(prices);
-      });
+  async ngOnInit(): Promise<void> {
+    const prices = await this.priceService.getPrices();
+    const settings = this.settingsService.loadSettings();
+    this.setDetails(prices[settings.display.exchanges[0]]);
   }
 
   confirm(): void {

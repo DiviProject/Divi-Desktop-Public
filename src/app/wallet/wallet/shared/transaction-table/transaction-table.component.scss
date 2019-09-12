@@ -9,21 +9,23 @@
 .mat-expansion-panel-header {
   min-height: 76px !important;
   font-size: 13px;
+
   &:hover {
     background: inherit;
   }
+
   .mat-expansion-panel-header-title {
     font-family: $font;
     line-height: 35px;
   }
 
   .history_date {
-    font-size: 14px;	
-    letter-spacing: 0.35px;	
+    font-size: 14px;
+    letter-spacing: 0.35px;
   }
 
   .history_longAddress {
-    font-size: 14px;	
+    font-size: 14px;
     letter-spacing: 0.35px;
 
     .address {
@@ -41,10 +43,8 @@
       background: $bg-currency;
 
       img {
-        width: 19px;
-        height: 19px;
-        color: $color-white;
-        padding: 8px;
+        width: 35px;
+        height: 35px;
         vertical-align: top;
       }
     }
@@ -60,10 +60,9 @@
   }
 
   .history_longAddress {
-    font-size: 14px;	
+    font-size: 14px;
     letter-spacing: 0.35px;
   }
-
   // confirmations
   .history_confirmation {
     .confirmations { // icon
@@ -76,9 +75,9 @@
     }
 
     .confirm {
-      font-size: 12px;	
-      font-weight: 400;	
-      letter-spacing: 0.3px;	
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.3px;
       line-height: 14px;
       width: 100px;
       padding: 10px;
@@ -88,19 +87,25 @@
       text-transform: capitalize;
 
       &.confirm-none { // unconfirmed TXs
-
       }
+
       &.confirm-1 { // 1-4 confirmations
         background: $bg-red;
         color: $color-white;
       }
+
       &.confirm-ok {
         background: $bg-green;
         color: $color-white;
       }
+
+      .double-tick {
+        width: 20px;
+        margin-bottom: -4px;
+        margin-top: -4px;
+      }
     }
   }
-
   // TX icon
   .history_cat_icon {
     .mat-icon {
@@ -111,12 +116,14 @@
       top: 3px;
       margin-right: 12px;
     }
+
     .tx-type {
       &.staked, &.reward, &.lottery, &.receive {
         .mat-icon {
           color: $color-success;
         }
       }
+
       &.send {
         .mat-icon {
           color: $color-alert;
@@ -131,11 +138,11 @@
       }
     }
   }
-
   // TX amount
   .history_amount {
     text-align: right;
     display: block;
+
     .amount {
       font-size: 20px;
       font-weight: bold;

@@ -12,7 +12,7 @@
 
       <div class="text-left">
         <h3>Enter manually:</h3>
-        <p class="secret">{{info.secret}}</p>
+        <p class="secret" class="cursor-pointer" matTooltipPosition="left" matTooltip="Copy code" ngxClipboard [cbContent]="info.secret" (click)="copyToClipBoard()">{{info.secret}}</p>
       </div>
     </ng-container>
 
@@ -28,7 +28,7 @@
     </ng-container>
 
     <ng-container *ngIf="steps.Verify === currentStep">
-      <p>Enter the token from your Authenticator app.</p>
+      <p>Enter the passcode from your Authenticator app.</p>
 
       <mat-form-field>
         <input matInput name="token" id="token" type="text" [(ngModel)]="token" placeholder="Passcode" maxlength="16" />

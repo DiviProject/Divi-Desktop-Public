@@ -7,6 +7,19 @@ import { TfaScopesModel } from "../models/tfa-scopes.model";
 
 @Injectable()
 export class SecurityService {
+    public getTimeouts(): any[] {
+        return [
+            { value: 60, title: "1 minute" },
+            { value: 120, title: "2 minutes" },
+            { value: 180, title: "3 minutes" },
+            { value: 300, title: "5 minutes" }, 
+            { value: 600, title: "10 minutes" },
+            { value: 1200, title: "20 minutes" },
+            { value: 1800, title: "30 minutes" },
+            { value: 0, title: "Always" }
+        ];
+    }
+
     public onChangeObs: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
     private isAutoUnlockEnabled: boolean = false;
@@ -24,6 +37,11 @@ export class SecurityService {
     isUnlocked(): boolean {
         const walletinfo = this.rpcState.get('getwalletinfo');
         return !!walletinfo && (walletinfo.encryptionstatus === "Unlocked" || walletinfo.encryptionstatus === "Unencrypted");
+    }
+
+    isUnlockedForStaking(): boolean {
+        const walletInfo = this.rpcState.get('getwalletinfo');
+        return !!walletInfo && (walletInfo.encryptionstatus === "Unlocked, staking only");
     }
     
     isAlwaysUnlocked(): boolean {
@@ -49,12 +67,17 @@ export class SecurityService {
             this.unlockData = {password, timeout, stakeOnly};
         }
         await (this.rpc.call('walletpassphrase', [password, timeout, stakeOnly]).toPromise());
-        await this.rpcState.stateCall('getwalletinfo');
+        await this.refresh();
     }
 
     async lock(): Promise<void> {
         await (this.rpc.call('walletlock').toPromise());
-        await this.rpcState.stateCall('getwalletinfo');
+        await this.refresh();
+    }
+
+    async refresh(): Promise<void> {
+        const result = await (this.rpc.call('getwalletinfo').toPromise());
+        this.rpcState.set('getwalletinfo', result);
     }
 
     public turnOnAutoUnlock(): void {

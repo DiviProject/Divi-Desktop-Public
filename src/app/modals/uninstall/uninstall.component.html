@@ -1,0 +1,35 @@
+<div class="container disable-select">
+  <div class="content">
+    <div class="section">
+      <div class="title">Uninstall</div>
+      <div class="description" *ngIf="!inProgress">
+        This action will remove all application files and user settings. This will also remove your wallet data. Please be careful and think twice!
+        <br />
+        <br/>
+        <b>Please be sure you have proper backup!</b>
+      </div>
+
+      <div class="description" *ngIf="inProgress">
+        <h3>Closing the application. You will be asked to allow uninstall process</h3>
+      </div>
+
+      <div class="actions" *ngIf="!inProgress">
+        <button mat-raised-button
+                color="primary"
+                (click)="backup()">
+          Backup
+        </button>
+        <button mat-raised-button
+                color="primary"
+                (click)="uninstall()">
+          Uninstall
+        </button>
+        <button mat-raised-button
+                color="primary"
+                (click)="close()">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

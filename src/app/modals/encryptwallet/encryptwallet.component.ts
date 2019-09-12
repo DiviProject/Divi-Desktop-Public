@@ -45,7 +45,7 @@ export class EncryptwalletComponent {
                     this._rpcState.set('ui:spinner', false);
                     this.flashNotification.open('Wallet successfully encrypted.', 'info');
                     this._dialogRef.close();
-                  });
+                  }, err => this.log.er('encryptwallet: daemon-restart:', err));
               });
             },
             // Handle error appropriately

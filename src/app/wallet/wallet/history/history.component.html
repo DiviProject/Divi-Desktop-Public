@@ -1,18 +1,49 @@
 <div class="container-block">
-  <div fxLayout="row">
+  <div fxLayout="row" fxLayoutGap="10px">
     <mat-form-field floatPlaceholder="never" class="sort-select">
       <mat-select placeholder="Sort by"
-                  (change)="sort($event.value)"
+                  (change)="sort('fld')"
                   [(ngModel)]="sortby">
         <mat-option *ngFor="let fld of sortFields" [value]="fld.value">
           {{ fld.title }}
         </mat-option>
       </mat-select>
     </mat-form-field>
+
+    <mat-form-field floatPlaceholder="never" class="sort-select">
+        <mat-select placeholder="Sort Direction"
+                    (change)="sort('dir')"
+                    [(ngModel)]="sortdirection">
+          <mat-option *ngFor="let dir of sortDirections" [value]="dir.value">
+            {{ dir.title }}
+          </mat-option>
+        </mat-select>
+    </mat-form-field>
     <button mat-button (click)="onExportToCsvClick()" class="export-to-csv">
       <mat-icon fontSet="partIcon" fontIcon="part-send"></mat-icon>
       Export To Csv
     </button>
+  </div>
+  <div fxLayout="row" fxLayoutGap="10px">
+    <mat-form-field>
+      <input matInput placeholder="From"
+        [max]="toDate"
+        [matDatepicker]="fromDatepicker"
+        [(ngModel)]="fromDate"
+        (dateInput)="onDateChange($event)">
+      <mat-datepicker-toggle matSuffix [for]="fromDatepicker"></mat-datepicker-toggle>
+      <mat-datepicker #fromDatepicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput placeholder="To"
+        [min]="fromDate"
+        [matDatepicker]="toDatepicker"
+        [(ngModel)]="toDate"
+        (dateInput)="onDateChange($event)">
+      <mat-datepicker-toggle matSuffix [for]="toDatepicker"></mat-datepicker-toggle>
+      <mat-datepicker #toDatepicker></mat-datepicker>
+    </mat-form-field>
   </div>
   <div class="history-header" fxLayout="row">
     <div class="transactions-count" fxFlex="20">
@@ -21,7 +52,7 @@
         </span>
         <span class="label">Transactions</span>
       </div>
-  
+
       <ul class="category-list" fxFlex="80">
         <li (click)="changeCategory(i)" *ngFor="let category of categories; let i = index" class="category-item" [ngClass]="{ 'active': i === selectedTab }">
             {{ category.title }}
@@ -30,7 +61,7 @@
   </div>
   <div class="tx-list section" fxLayout="row">
     <transaction-table #transactions
-                       [display]="{'header': false, 'internalHeader': true, 'pagination': true, 'category': true, 'expand': true, 'currency': true}">
+                       [display]="{'header': false, 'internalHeader': true, 'pagination': true, 'paginationPosition': 'top|bottom', 'category': true, 'expand': true, 'currency': true}">
     </transaction-table>
   </div><!-- .tx-list -->
 </div>

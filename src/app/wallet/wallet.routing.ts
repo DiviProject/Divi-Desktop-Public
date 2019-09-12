@@ -11,6 +11,7 @@ const routes: Routes = [
   { path: 'overview', component: OverviewComponent, data: { title: 'Overview' } },
   { path: 'receive', component: ReceiveComponent, data: { title: 'Receive' } },
   { path: 'send', component: SendComponent, data: { title: 'Send' } },
+  { path: 'send/:address', component: SendComponent, data: { title: 'Send' } },
   { path: 'history', component: HistoryComponent, data: { title: 'Transaction history' } },
   { path: 'address-book', component: AddressBookComponent, data: { title: 'Address Book' } },
   { path: 'settings', component: SettingsComponent, data: { title: 'Settings' } },

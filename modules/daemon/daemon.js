@@ -17,7 +17,7 @@ const userSettings  = require('../user/settings');
 let daemon = undefined;
 let chosenWallets = [];
 
-const defaultArgs = ["-maxconnections=1000", "-spendzeroconfchange"];
+const defaultArgs = ["-maxconnections=128", "-spendzeroconfchange"];
 
 function daemonData(data, logger) {
   data = data.toString().trim();
@@ -129,7 +129,7 @@ exports.check = function() {
       } else if (response) {
         resolve(response);
       }
-    });
+    }, err => log.error(err));
     rpc.setTimeoutDelay(_timeout);
   });
 }
@@ -142,7 +142,7 @@ function stopDaemon() {
       } else {
         reject(error);
       }
-    });
+    }, err => log.error(err));
   });
 }
 

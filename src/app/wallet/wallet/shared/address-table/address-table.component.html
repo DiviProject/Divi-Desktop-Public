@@ -53,6 +53,10 @@
           <div fxLayout="row" fxFlex="0 0 170px" fxFlex.lt-md="0 0 20px" fxLayoutAlign="center center"
                fxLayoutAlign.lt-md="start center" fxLayoutGap="10px" *ngIf="displayToolsMenu" class="address-actions">
             <!-- ICO: edit label -->
+            <!-- Send to Address -->
+            <span fxFlex="0 0 20px" fxLayoutAlign="center center">
+              <mat-icon fontSet="partIcon" fontIcon="part-send" (click)="onSendClick(address.address)" class="cursor-pointer" matTooltip="Send to Address"></mat-icon>
+            </span>
             <span fxFlex="0 0 20px" fxLayoutAlign="center center">
               <mat-icon fontSet="partIcon" fontIcon="part-pen-1" (click)="editLabel(address.address)" class="cursor-pointer" matTooltip="Edit address label"></mat-icon>
             </span>
@@ -93,5 +97,5 @@
   [length]="getTotalAddressCount()"
   [pageSize]="getMaxAddressesPerPage()"
   [pageSizeOptions]="PAGE_SIZE_OPTIONS"
-  (page)="pageChanged($event)">
+  (onChange)="pageChanged($event)">
 </app-paginator>

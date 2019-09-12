@@ -1,6 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Log } from 'ng2-logger';
-import { Subject } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 
 import { StateService } from 'app/core/state/state.service';
@@ -147,6 +148,7 @@ export class RpcStateService extends StateService implements OnDestroy {
           isBackedUp: !!localStorage.getItem("wallet:is-backed-up") || response.encryptionstatus !== "Unencrypted",
           isEncrypted: response.encryptionstatus !== "Unencrypted"
         });
+        this._rpc.call('global-store:set', ['wallet:unlocked-for-staking', response.encryptionstatus === 'Unlocked, staking only']);
       });
 
     this.errorsStateCall.asObservable()

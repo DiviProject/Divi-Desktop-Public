@@ -2,11 +2,14 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Location } from '@angular/common';
 
 import { ModalsService } from '../../modals/modals.module';
-import { RpcService, RpcStateService, BlockStatusService, DaemonService, SnackbarService, DiviService, AppSettingsService, SettingsService } from '../../core';
+import { RpcService, RpcStateService, BlockStatusService, DaemonService, SnackbarService, DiviService, AppSettingsService, SettingsService, SecurityService, PAGE_SIZE_OPTIONS } from '../../core';
 import { environment } from '../../../environments/environment';
 import { UserSettingsService } from 'app/core/services/user-settings.service';
 import { UserInfoService } from 'app/core/services/user-info.service';
 import { AuthScopes } from 'app/core/models/auth-scopes.enum';
+import { INotificationSetting, NotificationSettingsHelper } from 'app/core/models/notification-settings.model';
+import { Log } from 'ng2-logger';
+import { IExchangeSetting, ExchangeSettingsHelper } from 'app/core/models/exchange-settings.model';
 
 @Component({
   selector: 'app-settings',
@@ -18,9 +21,11 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   tab: string = 'main';
   net: string;
-  settings: Object;
+  settings: any;
   hasChanged: boolean = false;
 
+  public PAGE_SIZE_OPTIONS: Array<number> = PAGE_SIZE_OPTIONS;
+  public timeouts: any[] = [];
   public isLocked: boolean = true;
   public testnet: boolean;
   public daemonVersion: string;
@@ -30,18 +35,22 @@ export class SettingsComponent implements OnInit, OnDestroy {
   public walletInited: boolean = false;
   private isFullySynced: boolean = false;
   private enableCombine: boolean = false;
-  
+  private log: any = Log.create('settings.component');
+  private notifications: INotificationSetting[] = [];
+  public exchanges: IExchangeSetting[] = [];
+  public selectedExchange: string;
+
   public userSettings: {
     twoFactorAuthEnabled: boolean,
     twoFactorAuthScopes: string,
     twoFactorAuthScopesTemp: string
-  } = null; 
+  } = null;
 
   public userInfo: {
     email: string,
     userName: string,
     isSubscribed: boolean
-  } = null; 
+  } = null;
 
   constructor(
     private _settingsService: SettingsService,
@@ -55,7 +64,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
     private appSettingsService: AppSettingsService,
     private userSettingsService: UserSettingsService,
     private userInfoService: UserInfoService,
-    private blockStatusService: BlockStatusService
+    private blockStatusService: BlockStatusService,
+    private securityService: SecurityService
   ) {
     this.blockStatusService.isFullSynced
       .takeWhile(() => !this.destroyed)
@@ -65,7 +75,11 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.timeouts = this.securityService.getTimeouts();
     this.settings = this._settingsService.loadSettings();
+    this.notifications = NotificationSettingsHelper.getSettings(this.settings.display.notify);
+    this.exchanges = ExchangeSettingsHelper.getSettings();
+    this.selectedExchange = this.settings.display.exchanges[0];
 
     this._rpcState.observe('getwalletinfo', 'encryptionstatus')
       .takeWhile(() => !this.destroyed)
@@ -95,7 +109,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
     this._rpc.call('listunspent').subscribe(txs => {
       this.enableCombine = txs.length > 1;
-    });
+    }, error => this.log.er('listunspent: ', error));
   }
 
   ngOnDestroy() {
@@ -111,7 +125,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   async onLockedStateChanged(isLocked: boolean): Promise<void> {
     this.isLocked = isLocked != undefined ? isLocked : this.isLocked;
-    
+
     if (isLocked != undefined && !isLocked) {
       await this.initUserSettings();
       await this.initUserInfo();
@@ -133,7 +147,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
       this._rpc.call('update-setting', ['net', this.net]).subscribe(() => {
         this.restartDaemon();
         this.appSettingsService.init();
-      });
+      }, error => this.log.er('save: update-setting: ', error));
     }
   }
 
@@ -143,7 +157,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   async verifyWallet(): Promise<void> {
     const isUnlocked = await this._modals.unlock(AuthScopes.WALLET_VERIFY);
-    
+
     if (!isUnlocked) {
       return;
     }
@@ -151,7 +165,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this._rpc.call('walletverify').subscribe((result: boolean) => {
       this.showWalletVerifyModal(result);
     }, (err) => {
-      console.error(err);
+      this.log.er('verifyWallet:', err);
       this.showWalletVerifyModal(false);
     });
   }
@@ -199,11 +213,15 @@ export class SettingsComponent implements OnInit, OnDestroy {
   restartDaemon(args: Array<string> = []): void {
     this.flashNotificationService.open('Restarting daemon ... Please wait 30 seconds to use your wallet ...');
     this.daemonService.restart(args)
-      .subscribe(() => this.flashNotificationService.open('Daemon successfully restarted.'));
+      .subscribe(() => this.flashNotificationService.open('Daemon successfully restarted.'), error => this.log.er('restartDaemon: ', error));
+  }
+
+  reindex() {
+    this.restartDaemon(['-reindex']);
   }
 
   rescan() {
-    this.restartDaemon(['-reindex']);
+    this.restartDaemon(['-rescan']);
   }
 
   zapwallet() {
@@ -213,12 +231,20 @@ export class SettingsComponent implements OnInit, OnDestroy {
   private openBackupModal(): void {
     this._modals.open('createWallet', { data: { step: 3, disableBack: true, isRestore: false }, forceOpen: true });
   }
-  
+
   onSettingsChange(): void {
     this.apply();
   }
 
+  onCryptoMarketChange(event: string) {
+    this.settings.display.exchanges = [event];
+
+    this.apply();
+  }
+
   apply() {
+    this.settings.display.notify = this.notifications.filter(x => !!x.enabled).map(x => x.value);
+
     this._settingsService.applySettings(this.settings);
   }
 
@@ -233,8 +259,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   lockwallet() {
     this._rpc.call('walletlock')
     .subscribe(
-      success => this._rpcState.stateCall('getwalletinfo'),
-      error => console.error('walletlock error', error));
+      success => this._rpcState.stateCall('getwalletinfo'), error => this.log.er('lockwallet: ', error));
   }
 
   async unlockwallet(showStakeOnly: boolean = true): Promise<void> {
@@ -245,9 +270,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.flashNotificationService.open('Clearing cache ... Please wait 30 seconds to use your wallet ...');
     this.daemonService.stop().subscribe(() => {
       this._rpc.call('clear-cache').subscribe(() => {
-        this.daemonService.restart().subscribe(() => {});
-      });
-    });
+        this.daemonService.restart().subscribe(() => {}, error => this.log.er('clearCache: daemon-restart: ', error));
+      }, error => this.log.er('clearCache: clear-cache:', error));
+    }, error => this.log.er('clearCache: daemon-stop:', error));
   }
 
   onPrimerRestoreClick(): void {
@@ -264,6 +289,16 @@ export class SettingsComponent implements OnInit, OnDestroy {
     const modal = this._modals.open('tfaSettings', { forceOpen: true });
     await (modal.beforeClose().toPromise());
     await this.initUserSettings();
+  }
+
+  async onUninstallClick(): Promise<void> {
+    const isUnlocked = await this._modals.unlock(AuthScopes.BACKUP);
+
+    if (!isUnlocked) {
+      return;
+    }
+
+    this._modals.open('uninstall', { forceOpen: true });
   }
 
   async combineUtxos(): Promise<void> {

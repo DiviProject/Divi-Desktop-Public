@@ -4,12 +4,13 @@ import * as _ from 'lodash';
 import { FullBalanceInfo } from "../models/full-balance-info";
 
 import { Observable, BehaviorSubject } from "rxjs";
-import { map } from "rxjs/operators";
+import { Log } from "ng2-logger";
 
 @Injectable()
 export class BalanceService {
     public balance: BehaviorSubject<FullBalanceInfo> = new BehaviorSubject<FullBalanceInfo>(new FullBalanceInfo());
     private timeout: any = null;
+    private log: any = Log.create('balance.service');
 
     constructor(
         private rpcState: RpcStateService,
@@ -33,7 +34,7 @@ export class BalanceService {
             this.timeout = setTimeout(() => {
                 this.initBalance();
             }, 1000);
-        });
+        }, err => this.log.er('initBalance: ', err));
     }
 
     private getFullBalanceInfo(): Observable<FullBalanceInfo> {

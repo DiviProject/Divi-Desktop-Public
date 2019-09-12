@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Transaction } from './transaction.model';
-import { TransactionsStateService } from './transactions-state.service';
+import { TransactionsStateService } from '../../../core/services/transactions-state.service';
 /*
     This is a fake mock service used for the TransactionService.
     The TransactionTableComponent provides its _own_ TransactionService,

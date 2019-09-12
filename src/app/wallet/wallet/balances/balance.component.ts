@@ -44,6 +44,8 @@ export class BalanceComponent implements OnInit, OnDestroy {
         return 'PRIVATE BALANCE';
       case 'blind_balance':
         return 'BLIND BALANCE';
+      case 'staked_balance':
+        return 'STAKE';
       case 'fiat_balance':
         return 'USD BALANCE'
     }
