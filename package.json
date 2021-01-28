@@ -229,7 +229,7 @@
     "checksum": "^0.1.1",
     "codelyzer": "^4.1.0",
     "coveralls": "^3.0.0",
-    "electron": "4.0.3",
+    "electron": "9.4.0",
     "electron-builder": "20.22.0",
     "electron-publisher-s3": "^20.17.2",
     "htmlhint": "^0.9.13",
