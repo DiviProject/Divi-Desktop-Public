@@ -197,7 +197,7 @@
     "electron-updater": "3.0.3",
     "font-awesome": "^4.7.0",
     "fs-extra": "^8.0.1",
-    "got": "^8.1.0",
+    "got": "^11.8.5",
     "hammerjs": "^2.0.8",
     "json2csv": "^4.3.2",
     "lodash": "^4.17.15",
