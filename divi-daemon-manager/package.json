@@ -14,7 +14,7 @@
   "homepage": "https://diviproject.org",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "lodash": "^4.17.13",
     "path": "^0.12.7",
     "request": "^2.88.0",
